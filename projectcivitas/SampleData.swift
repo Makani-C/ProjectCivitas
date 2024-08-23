@@ -26,7 +26,8 @@ let sampleBills = [
         yesVotes: 120,
         noVotes: 80,
         userVote: nil,
-        comments: sampleComments
+        comments: sampleComments,
+        lastUpdated: Date()
     ),
     Bill(
         
@@ -41,7 +42,8 @@ let sampleBills = [
         yesVotes: 0,
         noVotes: 0,
         userVote: nil,
-        comments: []
+        comments: [],
+        lastUpdated: Date()
     ),
     Bill(
         
@@ -56,7 +58,8 @@ let sampleBills = [
         yesVotes: 120,
         noVotes: 80,
         userVote: nil,
-        comments: []
+        comments: [],
+        lastUpdated: Date()
     ),
     Bill(
         id: UUID(),
@@ -70,7 +73,8 @@ let sampleBills = [
         yesVotes: 120,
         noVotes: 80,
         userVote: nil,
-        comments: []
+        comments: [],
+        lastUpdated: Date()
     ),
     Bill(
         id: UUID(),
@@ -84,7 +88,8 @@ let sampleBills = [
         yesVotes: 120,
         noVotes: 80,
         userVote: nil,
-        comments: []
+        comments: [],
+        lastUpdated: Date()
     ),
     Bill(
         id: UUID(),
@@ -98,7 +103,8 @@ let sampleBills = [
         yesVotes: 120,
         noVotes: 80,
         userVote: nil,
-        comments: []
+        comments: [],
+        lastUpdated: Date()
     ),
     Bill(
         id: UUID(),
@@ -112,7 +118,8 @@ let sampleBills = [
         yesVotes: 120,
         noVotes: 80,
         userVote: nil,
-        comments: []
+        comments: [],
+        lastUpdated: Date()
     ),
 ]
 

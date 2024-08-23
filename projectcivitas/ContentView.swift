@@ -2,12 +2,27 @@ import SwiftUI
 
 // MARK: - Bill Views
 
+import SwiftUI
+
+// MARK: - Bill Views
+
 struct BillListPage: View {
     @EnvironmentObject var votingManager: VotingManager
-    @State private var searchText = ""
-    @State private var sortOption = "Updated (Desc)"
-    @State private var activeFilters = 2
-    @State private var filters = Filters()
+    @StateObject private var filterManager = FilterManager<Bill>(
+        initialSortOption: "Updated",
+        sortKeyPath: { sortOption in
+            switch sortOption {
+            case "Updated":
+                return { $0.lastUpdated > $1.lastUpdated }
+            case "Title":
+                return { $0.title < $1.title }
+            case "Popularity":
+                return { $0.yesVotes + $0.noVotes > $1.yesVotes + $1.noVotes }
+            default:
+                return { $0.lastUpdated > $1.lastUpdated }
+            }
+        }
+    )
     
     var body: some View {
         NavigationView {
@@ -27,166 +42,58 @@ struct BillListPage: View {
                 .fontWeight(.bold)
                 .foregroundColor(.white)
             
-            TextField("Search", text: $searchText)
+            TextField("Search", text: $filterManager.searchText)
                 .padding(10)
                 .background(Color.white)
                 .cornerRadius(8)
             
-            BillFilteredList(sortOption: $sortOption, filters: $filters)
+            BillFilteredList(filterManager: filterManager)
         }
         .padding()
         .background(Color.oldGloryBlue)
     }
     
-    private var filteredBills: [Bill] {
-        sampleBills.filter { bill in
-            (filters.tags.isEmpty || !Set(bill.tags).isDisjoint(with: filters.tags)) &&
-            (filters.sessions.isEmpty || filters.sessions.contains(bill.session)) &&
-            (filters.bodies.isEmpty || filters.bodies.contains(bill.body))
-        }
-    }
-    
     private var billList: some View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 0) {
-                ForEach(votingManager.bills, id: \.id) { bill in
+                ForEach(filteredBills, id: \.id) { bill in
                     BillRow(bill: bill)
                 }
             }
         }
     }
+    
+    private var filteredBills: [Bill] {
+        filterManager.filter(votingManager.bills) { bill, filters, searchText in
+            let matchesSearch = searchText.isEmpty || bill.title.lowercased().contains(searchText.lowercased())
+            let matchesFilters = filters.isEmpty || filters.allSatisfy { key, values in
+                switch key {
+                case "tags": return !Set(bill.tags).isDisjoint(with: values)
+                case "sessions": return values.contains(bill.session)
+                case "bodies": return values.contains(bill.body)
+                default: return true
+                }
+            }
+            return matchesSearch && matchesFilters
+        }
+    }
 }
 
 struct BillFilteredList: View {
-    @Binding var sortOption: String
-    @Binding var filters: Filters
+    @ObservedObject var filterManager: FilterManager<Bill>
     
-    let sortOptions = ["Updated (Desc)", "Updated (Asc)", "Bill Number", "Popularity"]
+    let sortOptions = ["Updated", "Title", "Popularity"]
+    
+    var filterCategories: [FilterCategory<Bill>] {
+        [
+            FilterCategory(name: "Tags", key: "tags", values: Array(Set(sampleBills.flatMap { $0.tags }))),
+            FilterCategory(name: "Sessions", key: "sessions", values: Array(Set(sampleBills.map { $0.session }))),
+            FilterCategory(name: "Bodies", key: "bodies", values: Array(Set(sampleBills.map { $0.body })))
+        ]
+    }
     
     var body: some View {
-        VStack(spacing: 10) {
-            HStack {
-                filterMenu
-                Spacer()
-                sortMenu
-            }
-            
-            if !filters.isEmpty {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack {
-                        ForEach(Array(filters.tags), id: \.self) { tag in
-                            FilterChip(title: "Tag: \(tag)") {
-                                filters.tags.remove(tag)
-                            }
-                        }
-                        ForEach(Array(filters.sessions), id: \.self) { session in
-                            FilterChip(title: "Session: \(session)") {
-                                filters.sessions.remove(session)
-                            }
-                        }
-                        ForEach(Array(filters.bodies), id: \.self) { body in
-                            FilterChip(title: "Body: \(body)") {
-                                filters.bodies.remove(body)
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        .padding(.vertical, 8)
-    }
-    
-    private var filterMenu: some View {
-        Menu {
-            Menu("Tags") {
-                ForEach(Array(Set(sampleBills.flatMap { $0.tags })), id: \.self) { tag in
-                    Button(action: {
-                        if filters.tags.contains(tag) {
-                            filters.tags.remove(tag)
-                        } else {
-                            filters.tags.insert(tag)
-                        }
-                    }) {
-                        HStack {
-                            Text(tag)
-                            if filters.tags.contains(tag) {
-                                Image(systemName: "checkmark")
-                            }
-                        }
-                    }
-                }
-            }
-            Menu("Sessions") {
-                ForEach(Array(Set(sampleBills.map { $0.session })), id: \.self) { session in
-                    Button(action: {
-                        if filters.sessions.contains(session) {
-                            filters.sessions.remove(session)
-                        } else {
-                            filters.sessions.insert(session)
-                        }
-                    }) {
-                        HStack {
-                            Text(session)
-                            if filters.sessions.contains(session) {
-                                Image(systemName: "checkmark")
-                            }
-                        }
-                    }
-                }
-            }
-            
-            Menu("Bodies") {
-                ForEach(Array(Set(sampleBills.map { $0.body })), id: \.self) { body in
-                    Button(action: {
-                        if filters.bodies.contains(body) {
-                            filters.bodies.remove(body)
-                        } else {
-                            filters.bodies.insert(body)
-                        }
-                    }) {
-                        HStack {
-                            Text(body)
-                            if filters.bodies.contains(body) {
-                                Image(systemName: "checkmark")
-                            }
-                        }
-                    }
-                }
-            }
-        } label: {
-            HStack {
-                Image(systemName: "line.3.horizontal.decrease")
-                Text("Filter\(!filters.isEmpty ? " (\(filters.count))" : "")")
-                Image(systemName: "chevron.down")
-            }.foregroundColor(.oldGloryRed)
-                .padding(.vertical, 8)
-                .padding(.horizontal, 12)
-                .background(Color.white)
-                .cornerRadius(8)
-        }
-    }
-    
-    private var sortMenu: some View {
-        Menu {
-            ForEach(sortOptions, id: \.self) { option in
-                Button(action: { sortOption = option }) {
-                    HStack {
-                        Text(option)
-                        if sortOption == option { Image(systemName: "checkmark") }
-                    }
-                }
-            }
-        } label: {
-            HStack {
-                Text("Sort: \(sortOption)")
-                Image(systemName: "chevron.down")
-            }
-            .foregroundColor(.oldGloryRed)
-            .padding(.vertical, 8)
-            .padding(.horizontal, 12)
-            .background(Color.white)
-            .cornerRadius(8)
-        }
+        FilteredList(filterManager: filterManager, sortOptions: sortOptions, filterCategories: filterCategories)
     }
 }
 
@@ -558,9 +465,21 @@ struct BillDetailPage: View {
 
 struct LegislatorListPage: View {
     let legislators: [Legislator]
-    @State private var searchText = ""
-    @State private var sortOption = "Name (A-Z)"
-    @State private var filters = LegislatorFilters()
+    @StateObject private var filterManager = FilterManager<Legislator>(
+        initialSortOption: "Name",
+        sortKeyPath: { sortOption in
+            switch sortOption {
+            case "Name":
+                return { $0.name < $1.name }
+            case "State":
+                return { $0.state < $1.state }
+            case "Party":
+                return { $0.party < $1.party }
+            default:
+                return { $0.name < $1.name }
+            }
+        }
+    )
     
     var body: some View {
         NavigationView {
@@ -580,12 +499,12 @@ struct LegislatorListPage: View {
                 .fontWeight(.bold)
                 .foregroundColor(.white)
             
-            TextField("Search", text: $searchText)
+            TextField("Search", text: $filterManager.searchText)
                 .padding(10)
                 .background(Color.white)
                 .cornerRadius(8)
             
-            LegislatorFilteredList(sortOption: $sortOption, filters: $filters)
+            LegislatorFilteredList(filterManager: filterManager)
         }
         .padding()
         .background(Color.oldGloryBlue)
@@ -605,145 +524,36 @@ struct LegislatorListPage: View {
     }
     
     private var filteredLegislators: [Legislator] {
-        legislators.filter { legislator in
-            (searchText.isEmpty || legislator.name.lowercased().contains(searchText.lowercased())) &&
-            (filters.parties.isEmpty || filters.parties.contains(legislator.party)) &&
-            (filters.states.isEmpty || filters.states.contains(legislator.state)) &&
-            (filters.chambers.isEmpty || filters.chambers.contains(legislator.chamber))
+        filterManager.filter(legislators) { legislator, filters, searchText in
+            let matchesSearch = searchText.isEmpty || legislator.name.lowercased().contains(searchText.lowercased())
+            let matchesFilters = filters.isEmpty || filters.allSatisfy { key, values in
+                switch key {
+                case "parties": return values.contains(legislator.party)
+                case "states": return values.contains(legislator.state)
+                case "chambers": return values.contains(legislator.chamber)
+                default: return true
+                }
+            }
+            return matchesSearch && matchesFilters
         }
     }
 }
 
 struct LegislatorFilteredList: View {
-    @Binding var sortOption: String
-    @Binding var filters: LegislatorFilters
+    @ObservedObject var filterManager: FilterManager<Legislator>
     
-    let sortOptions = ["Name (A-Z)", "Name (Z-A)", "State", "Party"]
+    let sortOptions = ["Name", "State", "Party"]
+    
+    var filterCategories: [FilterCategory<Legislator>] {
+        [
+            FilterCategory(name: "Parties", key: "parties", values: Array(Set(sampleLegislators.map { $0.party }))),
+            FilterCategory(name: "States", key: "states", values: Array(Set(sampleLegislators.map { $0.state }))),
+            FilterCategory(name: "Chambers", key: "chambers", values: Array(Set(sampleLegislators.map { $0.chamber })))
+        ]
+    }
     
     var body: some View {
-        VStack(spacing: 10) {
-            HStack {
-                filterMenu
-                Spacer()
-                sortMenu
-            }
-            
-            if !filters.isEmpty {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack {
-                        ForEach(Array(filters.parties), id: \.self) { party in
-                            FilterChip(title: "Party: \(party)") {
-                                filters.parties.remove(party)
-                            }
-                        }
-                        ForEach(Array(filters.states), id: \.self) { state in
-                            FilterChip(title: "State: \(state)") {
-                                filters.states.remove(state)
-                            }
-                        }
-                        ForEach(Array(filters.chambers), id: \.self) { chamber in
-                            FilterChip(title: "Chamber: \(chamber)") {
-                                filters.chambers.remove(chamber)
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        .padding(.vertical, 8)
-    }
-    
-    private var filterMenu: some View {
-        Menu {
-            Menu("Parties") {
-                ForEach(Array(Set(sampleLegislators.map { $0.party })), id: \.self) { party in
-                    Button(action: {
-                        if filters.parties.contains(party) {
-                            filters.parties.remove(party)
-                        } else {
-                            filters.parties.insert(party)
-                        }
-                    }) {
-                        HStack {
-                            Text(party)
-                            if filters.parties.contains(party) {
-                                Image(systemName: "checkmark")
-                            }
-                        }
-                    }
-                }
-            }
-            Menu("States") {
-                ForEach(Array(Set(sampleLegislators.map { $0.state })), id: \.self) { state in
-                    Button(action: {
-                        if filters.states.contains(state) {
-                            filters.states.remove(state)
-                        } else {
-                            filters.states.insert(state)
-                        }
-                    }) {
-                        HStack {
-                            Text(state)
-                            if filters.states.contains(state) {
-                                Image(systemName: "checkmark")
-                            }
-                        }
-                    }
-                }
-            }
-            Menu("Chambers") {
-                ForEach(Array(Set(sampleLegislators.map { $0.chamber })), id: \.self) { chamber in
-                    Button(action: {
-                        if filters.chambers.contains(chamber) {
-                            filters.chambers.remove(chamber)
-                        } else {
-                            filters.chambers.insert(chamber)
-                        }
-                    }) {
-                        HStack {
-                            Text(chamber)
-                            if filters.chambers.contains(chamber) {
-                                Image(systemName: "checkmark")
-                            }
-                        }
-                    }
-                }
-            }
-        } label: {
-            HStack {
-                Image(systemName: "line.3.horizontal.decrease")
-                Text("Filter\(!filters.isEmpty ? " (\(filters.count))" : "")")
-                Image(systemName: "chevron.down")
-            }
-            .foregroundColor(.oldGloryRed)
-            .padding(.vertical, 8)
-            .padding(.horizontal, 12)
-            .background(Color.white)
-            .cornerRadius(8)
-        }
-    }
-    
-    private var sortMenu: some View {
-        Menu {
-            ForEach(sortOptions, id: \.self) { option in
-                Button(action: { sortOption = option }) {
-                    HStack {
-                        Text(option)
-                        if sortOption == option { Image(systemName: "checkmark") }
-                    }
-                }
-            }
-        } label: {
-            HStack {
-                Text("Sort: \(sortOption)")
-                Image(systemName: "chevron.down")
-            }
-            .foregroundColor(.oldGloryRed)
-            .padding(.vertical, 8)
-            .padding(.horizontal, 12)
-            .background(Color.white)
-            .cornerRadius(8)
-        }
+        FilteredList(filterManager: filterManager, sortOptions: sortOptions, filterCategories: filterCategories)
     }
 }
 
@@ -1019,6 +829,108 @@ struct TopicSelectorView: View {
 }
 
 // MARK: - General
+
+struct FilteredList<T>: View {
+    @ObservedObject var filterManager: FilterManager<T>
+    let sortOptions: [String]
+    let filterCategories: [FilterCategory<T>]
+    
+    var body: some View {
+        VStack(spacing: 10) {
+            HStack {
+                filterMenu
+                Spacer()
+                sortMenu
+            }
+            
+            if !filterManager.isEmpty {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack {
+                        ForEach(filterManager.filters.keys.sorted(), id: \.self) { key in
+                            ForEach(Array(filterManager.filters[key] ?? []), id: \.self) { value in
+                                FilterChip(title: "\(key): \(value)") {
+                                    filterManager.removeFilter(value, forKey: key)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        .padding(.vertical, 8)
+    }
+    
+    private var filterMenu: some View {
+        Menu {
+            ForEach(filterCategories, id: \.key) { category in
+                Menu(category.name) {
+                    ForEach(category.values, id: \.self) { value in
+                        Button(action: {
+                            filterManager.addFilter(value, forKey: category.key)
+                        }) {
+                            HStack {
+                                Text(value)
+                                if filterManager.filters[category.key]?.contains(value) == true {
+                                    Image(systemName: "checkmark")
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } label: {
+            HStack {
+                Image(systemName: "line.3.horizontal.decrease")
+                Text("Filter\(!filterManager.isEmpty ? " (\(filterManager.count))" : "")")
+                Image(systemName: "chevron.down")
+            }
+            .foregroundColor(.oldGloryRed)
+            .padding(.vertical, 8)
+            .padding(.horizontal, 12)
+            .background(Color.white)
+            .cornerRadius(8)
+        }
+    }
+    
+    private var sortMenu: some View {
+        Menu {
+            ForEach(sortOptions, id: \.self) { option in
+                Button(action: {
+                    if filterManager.sortOption == option {
+                        filterManager.toggleSortOrder()
+                    } else {
+                        filterManager.sortOption = option
+                        filterManager.sortOrder = .ascending
+                    }
+                }) {
+                    HStack {
+                        Text(option)
+                        if filterManager.sortOption == option {
+                            Image(systemName: filterManager.sortOrder == .ascending ? "chevron.up" : "chevron.down")
+                        }
+                    }
+                }
+            }
+        } label: {
+            HStack {
+                Text("Sort: \(filterManager.sortOption)")
+                Image(systemName: filterManager.sortOrder == .ascending ? "chevron.up" : "chevron.down")
+            }
+            .foregroundColor(.oldGloryRed)
+            .padding(.vertical, 8)
+            .padding(.horizontal, 12)
+            .background(Color.white)
+            .cornerRadius(8)
+        }
+    }
+}
+
+struct FilterCategory<T> {
+    let name: String
+    let key: String
+    let values: [String]
+}
+
 
 struct ContentView: View {
     @StateObject private var userVotingRecord = UserVotingRecord()

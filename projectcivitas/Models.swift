@@ -24,8 +24,9 @@ struct Bill: Identifiable {
     var noVotes: Int
     var userVote: Vote?
     var comments: [Comment]
+    var lastUpdated: Date
     
-    init(id: UUID = UUID(), title: String, description: String, state: String, body: String, session: String, tags: [String], briefing: String, yesVotes: Int, noVotes: Int, userVote: Vote?, comments: [Comment]) {
+    init(id: UUID = UUID(), title: String, description: String, state: String, body: String, session: String, tags: [String], briefing: String, yesVotes: Int, noVotes: Int, userVote: Vote?, comments: [Comment], lastUpdated: Date) {
         self.id = id
         self.title = title
         self.description = description
@@ -38,6 +39,7 @@ struct Bill: Identifiable {
         self.noVotes = noVotes
         self.userVote = userVote
         self.comments = comments
+        self.lastUpdated = lastUpdated
     }
 }
 
