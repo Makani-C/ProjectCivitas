@@ -147,7 +147,7 @@ let sampleLegislators = [
             VotingRecord(billId: sampleBills[0].id, vote: .yes, date: Date()),
             VotingRecord(billId: sampleBills[1].id, vote: .no, date: Date().addingTimeInterval(-86400)),
             VotingRecord(billId: sampleBills[2].id, vote: .yes, date: Date().addingTimeInterval(-172800)),
-            // Add more voting records as needed...
+            VotingRecord(billId: sampleBills[3].id, vote: .notPresent, date: Date().addingTimeInterval(-172800)),
         ]
     ),
 ]

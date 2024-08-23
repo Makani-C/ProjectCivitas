@@ -8,8 +8,7 @@
 import Foundation
 
 enum Vote: String {
-    case yes, no
-}
+    case yes, no, abstain, notPresent}
 
 struct Bill: Identifiable {
     let id: UUID
@@ -87,8 +86,17 @@ struct Legislator: Identifiable {
             }
             return record.vote == userVote
         }
-        
         return Double(matchingVotes.count) / Double(votingRecord.count) * 100
+    }
+    
+    func attendanceScore() -> Double {
+        var attendedVotes = 0
+        for record in votingRecord {
+            if record.vote != .notPresent {
+                attendedVotes += 1
+            }
+        }
+        return Double(attendedVotes) / Double(votingRecord.count) * 100
     }
 }
 

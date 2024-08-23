@@ -586,7 +586,6 @@ struct LegislatorRow: View {
     }
 }
 
-
 struct LegislatorDetailPage: View {
     let legislator: Legislator
     @EnvironmentObject var votingManager: VotingManager
@@ -597,7 +596,9 @@ struct LegislatorDetailPage: View {
             legislatorHeader
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
-                    Text("Alignment Score: \(String(format: "%.1f", legislator.alignmentScore(with: userVotingRecord.votes)))%")
+                    Text("Attendance Score: \(String(format: "%.0f", legislator.attendanceScore()))%")
+                        .font(.headline)
+                    Text("Alignment Score: \(String(format: "%.0f", legislator.alignmentScore(with: userVotingRecord.votes)))%")
                         .font(.headline)
                     infoSection(title: "Top Issues") {
                         ForEach(legislator.topIssues, id: \.self) { issue in
