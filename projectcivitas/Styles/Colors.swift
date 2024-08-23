@@ -1,8 +1,3 @@
-//
-//  Colors.swift
-//
-
-import Foundation
 import SwiftUI
 
 extension Color {

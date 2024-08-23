@@ -148,6 +148,166 @@ let sampleLegislators = [
             VotingRecord(billId: sampleBills[1].id, vote: .no, date: Date().addingTimeInterval(-86400)),
             VotingRecord(billId: sampleBills[2].id, vote: .yes, date: Date().addingTimeInterval(-172800)),
             VotingRecord(billId: sampleBills[3].id, vote: .notPresent, date: Date().addingTimeInterval(-172800)),
+        ],
+        fundingRecord: [
+            FundingRecord(source: "Individual Contributions", amount: 500000, date: Date()),
+            FundingRecord(source: "PAC Contributions", amount: 250000, date: Date().addingTimeInterval(-86400)),
+            FundingRecord(source: "Self-Funding", amount: 100000, date: Date().addingTimeInterval(-172800))
+        ]
+    ),
+    Legislator(
+        name: "John Smith",
+        party: "Democrat",
+        state: "California",
+        district: "12th",
+        chamber: "House of Representatives",
+        imageUrl: "https://example.com/john_smith.jpg",
+        biography: "John Smith has served in the House of Representatives since 2015...",
+        topIssues: ["Climate Change", "Healthcare Reform", "Education"],
+        contactInfo: ContactInfo(
+            email: "john.smith@house.gov",
+            phone: "(202) 555-0123",
+            office: "123 Capitol Hill, Washington D.C."
+        ),
+        socialMedia: SocialMedia(
+            twitter: "repjohnsmith",
+            facebook: "RepJohnSmith",
+            instagram: "repjohnsmith"
+        ),
+        votingRecord: [
+            VotingRecord(billId: sampleBills[0].id, vote: .yes, date: Date()),
+            VotingRecord(billId: sampleBills[1].id, vote: .no, date: Date().addingTimeInterval(-86400)),
+            VotingRecord(billId: sampleBills[2].id, vote: .yes, date: Date().addingTimeInterval(-172800)),
+            VotingRecord(billId: sampleBills[3].id, vote: .notPresent, date: Date().addingTimeInterval(-172800)),
+        ],
+        fundingRecord: [
+            FundingRecord(source: "Individual Contributions", amount: 500000, date: Date()),
+            FundingRecord(source: "PAC Contributions", amount: 250000, date: Date().addingTimeInterval(-86400)),
+            FundingRecord(source: "Self-Funding", amount: 100000, date: Date().addingTimeInterval(-172800))
+        ]
+    ),
+    Legislator(
+        name: "John Smith",
+        party: "Democrat",
+        state: "California",
+        district: "12th",
+        chamber: "House of Representatives",
+        imageUrl: "https://example.com/john_smith.jpg",
+        biography: "John Smith has served in the House of Representatives since 2015...",
+        topIssues: ["Climate Change", "Healthcare Reform", "Education"],
+        contactInfo: ContactInfo(
+            email: "john.smith@house.gov",
+            phone: "(202) 555-0123",
+            office: "123 Capitol Hill, Washington D.C."
+        ),
+        socialMedia: SocialMedia(
+            twitter: "repjohnsmith",
+            facebook: "RepJohnSmith",
+            instagram: "repjohnsmith"
+        ),
+        votingRecord: [
+            VotingRecord(billId: sampleBills[0].id, vote: .yes, date: Date()),
+            VotingRecord(billId: sampleBills[1].id, vote: .no, date: Date().addingTimeInterval(-86400)),
+            VotingRecord(billId: sampleBills[2].id, vote: .yes, date: Date().addingTimeInterval(-172800)),
+            VotingRecord(billId: sampleBills[3].id, vote: .notPresent, date: Date().addingTimeInterval(-172800)),
+        ],
+        fundingRecord: [
+            FundingRecord(source: "Individual Contributions", amount: 500000, date: Date()),
+            FundingRecord(source: "PAC Contributions", amount: 250000, date: Date().addingTimeInterval(-86400)),
+            FundingRecord(source: "Self-Funding", amount: 100000, date: Date().addingTimeInterval(-172800))
+        ]
+    ),
+    Legislator(
+        name: "John Smith",
+        party: "Democrat",
+        state: "California",
+        district: "12th",
+        chamber: "House of Representatives",
+        imageUrl: "https://example.com/john_smith.jpg",
+        biography: "John Smith has served in the House of Representatives since 2015...",
+        topIssues: ["Climate Change", "Healthcare Reform", "Education"],
+        contactInfo: ContactInfo(
+            email: "john.smith@house.gov",
+            phone: "(202) 555-0123",
+            office: "123 Capitol Hill, Washington D.C."
+        ),
+        socialMedia: SocialMedia(
+            twitter: "repjohnsmith",
+            facebook: "RepJohnSmith",
+            instagram: "repjohnsmith"
+        ),
+        votingRecord: [
+            VotingRecord(billId: sampleBills[0].id, vote: .yes, date: Date()),
+            VotingRecord(billId: sampleBills[1].id, vote: .no, date: Date().addingTimeInterval(-86400)),
+            VotingRecord(billId: sampleBills[2].id, vote: .yes, date: Date().addingTimeInterval(-172800)),
+            VotingRecord(billId: sampleBills[3].id, vote: .notPresent, date: Date().addingTimeInterval(-172800)),
+        ],
+        fundingRecord: [
+            FundingRecord(source: "Individual Contributions", amount: 500000, date: Date()),
+            FundingRecord(source: "PAC Contributions", amount: 250000, date: Date().addingTimeInterval(-86400)),
+            FundingRecord(source: "Self-Funding", amount: 100000, date: Date().addingTimeInterval(-172800))
+        ]
+    ),
+    Legislator(
+        name: "John Smith",
+        party: "Democrat",
+        state: "California",
+        district: "12th",
+        chamber: "House of Representatives",
+        imageUrl: "https://example.com/john_smith.jpg",
+        biography: "John Smith has served in the House of Representatives since 2015...",
+        topIssues: ["Climate Change", "Healthcare Reform", "Education"],
+        contactInfo: ContactInfo(
+            email: "john.smith@house.gov",
+            phone: "(202) 555-0123",
+            office: "123 Capitol Hill, Washington D.C."
+        ),
+        socialMedia: SocialMedia(
+            twitter: "repjohnsmith",
+            facebook: "RepJohnSmith",
+            instagram: "repjohnsmith"
+        ),
+        votingRecord: [
+            VotingRecord(billId: sampleBills[0].id, vote: .yes, date: Date()),
+            VotingRecord(billId: sampleBills[1].id, vote: .no, date: Date().addingTimeInterval(-86400)),
+            VotingRecord(billId: sampleBills[2].id, vote: .yes, date: Date().addingTimeInterval(-172800)),
+            VotingRecord(billId: sampleBills[3].id, vote: .notPresent, date: Date().addingTimeInterval(-172800)),
+        ],
+        fundingRecord: [
+            FundingRecord(source: "Individual Contributions", amount: 500000, date: Date()),
+            FundingRecord(source: "PAC Contributions", amount: 250000, date: Date().addingTimeInterval(-86400)),
+            FundingRecord(source: "Self-Funding", amount: 100000, date: Date().addingTimeInterval(-172800))
+        ]
+    ),
+    Legislator(
+        name: "John Smith",
+        party: "Democrat",
+        state: "California",
+        district: "12th",
+        chamber: "House of Representatives",
+        imageUrl: "https://example.com/john_smith.jpg",
+        biography: "John Smith has served in the House of Representatives since 2015...",
+        topIssues: ["Climate Change", "Healthcare Reform", "Education"],
+        contactInfo: ContactInfo(
+            email: "john.smith@house.gov",
+            phone: "(202) 555-0123",
+            office: "123 Capitol Hill, Washington D.C."
+        ),
+        socialMedia: SocialMedia(
+            twitter: "repjohnsmith",
+            facebook: "RepJohnSmith",
+            instagram: "repjohnsmith"
+        ),
+        votingRecord: [
+            VotingRecord(billId: sampleBills[0].id, vote: .yes, date: Date()),
+            VotingRecord(billId: sampleBills[1].id, vote: .no, date: Date().addingTimeInterval(-86400)),
+            VotingRecord(billId: sampleBills[2].id, vote: .yes, date: Date().addingTimeInterval(-172800)),
+            VotingRecord(billId: sampleBills[3].id, vote: .notPresent, date: Date().addingTimeInterval(-172800)),
+        ],
+        fundingRecord: [
+            FundingRecord(source: "Individual Contributions", amount: 500000, date: Date()),
+            FundingRecord(source: "PAC Contributions", amount: 250000, date: Date().addingTimeInterval(-86400)),
+            FundingRecord(source: "Self-Funding", amount: 100000, date: Date().addingTimeInterval(-172800))
         ]
     ),
 ]

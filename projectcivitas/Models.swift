@@ -78,6 +78,7 @@ struct Legislator: Identifiable {
     let contactInfo: ContactInfo
     let socialMedia: SocialMedia
     let votingRecord: [VotingRecord]
+    let fundingRecord: [FundingRecord]
     
     func alignmentScore(with userVotes: [UUID: Vote]) -> Double {
         let matchingVotes = votingRecord.filter { record in
@@ -116,5 +117,12 @@ struct VotingRecord: Identifiable {
     let id = UUID()
     let billId: UUID
     let vote: Vote
+    let date: Date
+}
+
+struct FundingRecord: Identifiable {
+    let id = UUID()
+    let source: String
+    let amount: Double
     let date: Date
 }
