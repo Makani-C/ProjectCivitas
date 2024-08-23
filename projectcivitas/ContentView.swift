@@ -1,7 +1,5 @@
 import SwiftUI
 
-import SwiftUI
-
 // MARK: - Feed
 
 struct FeedItem: Identifiable {
@@ -10,6 +8,7 @@ struct FeedItem: Identifiable {
     let description: String
     let date: Date
     let associatedItems: [AssociatedItem]
+    let tags: [String]
 }
 
 struct AssociatedItem: Identifiable {
@@ -32,28 +31,31 @@ struct FeedView: View {
             date: Date(),
             associatedItems: [
                 AssociatedItem(type: .bill, itemId: UUID(), title: "EPA Bill"),
-            ]
+            ],
+            tags: ["Environment", "New Legislation"]
         ),
         FeedItem(
-            title: "Legislator Update",
-            description: "Senator Smith has updated their voting record.",
+            title: "Legislator Vote",
+            description: "Your Senator, John Smith has voted on a bill you were following",
             date: Date(),
             associatedItems: [
                 AssociatedItem(type: .legislator, itemId: sampleLegislators[0].id, title: sampleLegislators[0].name),
-            ]
+            ],
+            tags: ["California"]
         ),
         FeedItem(
             title: "New Environmental Protection Bills",
-            description: "Multiple bills on environmental protection have been introduced.",
+            description: "Multiple bills on environmental protection are scheduled for a vote",
             date: Date(),
             associatedItems: [
                 AssociatedItem(type: .bill, itemId: UUID(), title: "EPA Bill"),
                 AssociatedItem(type: .bill, itemId: UUID(), title: "WWC Bill")
-            ]
+            ],
+            tags: ["Environment"]
         ),
         FeedItem(
-            title: "Legislators Update Voting Records",
-            description: "Several legislators have updated their voting records.",
+            title: "New Cannabis Bill",
+            description: "Legislators cosponsor bill providing for banking for cannabis companies",
             date: Date(),
             associatedItems: [
                 AssociatedItem(type: .legislator, itemId: sampleLegislators[0].id, title: sampleLegislators[0].name),
@@ -62,9 +64,26 @@ struct FeedView: View {
                 AssociatedItem(type: .legislator, itemId: sampleLegislators[3].id, title: sampleLegislators[3].name),
                 AssociatedItem(type: .legislator, itemId: sampleLegislators[4].id, title: sampleLegislators[4].name),
                 AssociatedItem(type: .legislator, itemId: sampleLegislators[5].id, title: sampleLegislators[5].name),
-            ]
+                AssociatedItem(type: .bill, itemId: sampleBills[0].id, title: sampleBills[0].title),
+            ],
+            tags: ["Cannabis", "Banking"]
         )
     ]
+    @State private var selectedTags: Set<String> = []
+    
+    var filteredFeedItems: [FeedItem] {
+        if selectedTags.isEmpty {
+            return feedItems
+        } else {
+            return feedItems.filter { item in
+                !selectedTags.isDisjoint(with: Set(item.tags))
+            }
+        }
+    }
+    
+    var allTags: [String] {
+        Array(Set(feedItems.flatMap { $0.tags })).sorted()
+    }
     
     var body: some View {
         NavigationView {
@@ -76,18 +95,48 @@ struct FeedView: View {
                         .foregroundColor(.white)
                 }
                 
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack {
+                        ForEach(allTags, id: \.self) { tag in
+                            TagFilterButton(tag: tag, isSelected: selectedTags.contains(tag)) {
+                                if selectedTags.contains(tag) {
+                                    selectedTags.remove(tag)
+                                } else {
+                                    selectedTags.insert(tag)
+                                }
+                            }
+                        }
+                    }
+                    .padding()
+                }
+                
                 ScrollView {
                     LazyVStack(spacing: 16) {
-                        ForEach(feedItems) { item in
+                        ForEach(filteredFeedItems) { item in
                             FeedItemView(item: item)
                         }
                     }
-                    .padding(.horizontal)
-                    .padding(.top)
+                    .padding()
                 }
-                .background(Color(UIColor.systemBackground))
             }
             .navigationBarHidden(true)
+        }
+    }
+}
+
+struct TagFilterButton: View {
+    let tag: String
+    let isSelected: Bool
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            Text(tag)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 5)
+                .background(isSelected ? Color.oldGloryBlue : Color.gray.opacity(0.2))
+                .foregroundColor(isSelected ? .white : .oldGloryBlue)
+                .cornerRadius(15)
         }
     }
 }
@@ -99,11 +148,23 @@ struct FeedItemView: View {
         VStack(alignment: .leading, spacing: 8) {
             Text(item.title)
                 .font(.headline)
+                .foregroundColor(.oldGloryRed)
             Text(item.description)
                 .font(.subheadline)
             Text(item.date, style: .date)
                 .font(.caption)
                 .foregroundColor(.secondary)
+            HStack {
+                ForEach(item.tags, id: \.self) { tag in
+                    Text(tag)
+                        .font(.caption)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(Color.oldGloryBlue.opacity(0.1))
+                        .foregroundColor(.oldGloryBlue)
+                        .cornerRadius(8)
+                }
+            }
             
             AssociatedItemsCarousel(items: item.associatedItems)
         }
@@ -462,33 +523,49 @@ struct BillDetailPage: View {
     @State var bill: Bill
     @State private var showingAddComment = false
     
+    @State private var showingCelebration = false
+    @State private var celebratedVote: Vote?
+    @State private var voteButtonScale: CGFloat = 1.0
+    
     var body: some View {
-        VStack(spacing: 0) {
-            billHeader
-            ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
-                    citizenOpinionSection
-                    votingSection
-                    citizensBriefingSection
-                    commentSection
+        ZStack {
+            VStack(spacing: 0) {
+                billHeader
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 16) {
+                        citizenOpinionSection
+                        votingSection
+                        citizensBriefingSection
+                        commentSection
+                    }
+                    .padding()
                 }
-                .padding()
             }
-        }
-        .navigationBarTitleDisplayMode(.inline)
-        .navigationBarBackButtonHidden(true)
-        .navigationBarItems(leading: BackButton())
-        .sheet(isPresented: $showingAddComment) {
-            AddCommentModal(bill: $bill, parentId: nil)
+            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarBackButtonHidden(true)
+            .navigationBarItems(leading: BackButton())
+            .sheet(isPresented: $showingAddComment) {
+                AddCommentModal(bill: $bill, parentId: nil)
+            }
+            
+            if showingCelebration, let vote = celebratedVote {
+                CelebrateVoteView(vote: vote, isPresented: $showingCelebration)
+            }
         }
     }
     
     private var billHeader: some View {
         HeaderView {
-            Text(bill.state).font(.title)
+            Text(bill.state)
+                .font(.largeTitle)
+                .bold()
+                .foregroundColor(.white)
+            
             Text(bill.title).font(.title)
-            Text("Body: \(bill.body)").font(.subheadline)
-            Text("Session: \(bill.session)").font(.subheadline)
+                .bold()
+                .foregroundColor(.white)
+            Text("Body: \(bill.body)").font(.subheadline).foregroundColor(.white)
+            Text("Session: \(bill.session)").font(.subheadline).foregroundColor(.white)
             tagScrollView
         }
     }
@@ -497,6 +574,7 @@ struct BillDetailPage: View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack {
                 Text("Tags:").font(.subheadline)
+                    .foregroundColor(.white)
                 ForEach(bill.tags, id: \.self) { TagChip(title: $0) }
             }
         }
@@ -516,19 +594,11 @@ struct BillDetailPage: View {
     
     private var votingSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            if let userVote = bill.userVote {
-                Text("You voted: \(userVote == .yes ? "Yes" : "No").")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-            } else {
-                Text("Do you approve of this bill?")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-            }
-            
             HStack {
                 VoteButton(title: "Vote Yes", color: .fruitSaladGreen, action: { vote(.yes) }, isSelected: bill.userVote == .yes)
+                    .scaleEffect(bill.userVote == .yes ? voteButtonScale : 1.0)
                 VoteButton(title: "Vote No", color: .oldGloryRed, action: { vote(.no) }, isSelected: bill.userVote == .no)
+                    .scaleEffect(bill.userVote == .no ? voteButtonScale : 1.0)
             }
         }
     }
@@ -536,6 +606,19 @@ struct BillDetailPage: View {
     private func vote(_ vote: Vote) {
         votingManager.vote(for: bill, vote: vote)
         updateBillState()
+        
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.6, blendDuration: 0)) {
+            voteButtonScale = 1.2
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.6, blendDuration: 0)) {
+                voteButtonScale = 1.0
+            }
+        }
+        
+        celebratedVote = vote
+        showingCelebration = true
     }
     
     private var citizensBriefingSection: some View {
@@ -613,7 +696,7 @@ struct LegislatorRow: View {
             .clipShape(Circle())
             
             VStack(alignment: .leading, spacing: 4) {
-                Text(legislator.name).font(.headline)
+                Text(legislator.name).font(.headline).foregroundColor(.oldGloryRed)
                 Text("\(legislator.party) - \(legislator.state)").font(.subheadline)
                 Text(legislator.chamber).font(.caption)
             }
@@ -807,6 +890,107 @@ struct LegislatorDetailPage: View {
             formatter.dateStyle = .short
             return formatter
         }()
+    }
+}
+
+
+struct CelebrateVoteView: View {
+    let vote: Vote
+    @Binding var isPresented: Bool
+    
+    @State private var scale: CGFloat = 0.5
+    @State private var rotation: Double = 0
+    @State private var opacity: Double = 0
+    
+    var body: some View {
+        ZStack {
+            Color.black.opacity(0.5)
+                .edgesIgnoringSafeArea(.all)
+                .onTapGesture {
+                    dismissAnimation()
+                }
+            
+            VStack {
+                Image(systemName: vote == .yes ? "checkmark.circle.fill" : "xmark.circle.fill")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 200, height: 100)
+                    .foregroundColor(vote == .yes ? .fruitSaladGreen : .oldGloryRed)
+                
+                Text("Voted!")
+                    .font(.system(size: 40, weight: .bold))
+                    .foregroundColor(Color(red: 1.0, green: 0.8, blue: 0.0))
+                    .shadow(color: .black.opacity(0.6), radius: 2, x: 1, y: 1)
+            }
+            .padding(30)
+            .background(
+                ZStack {
+                    Color.white
+                    PatrioticBackground()
+                }
+            )
+            .cornerRadius(20)
+            .overlay(
+                RoundedRectangle(cornerRadius: 20)
+                    .stroke(Color.oldGloryBlue, lineWidth: 4)
+            )
+            .scaleEffect(scale)
+            .rotationEffect(.degrees(rotation))
+            .opacity(opacity)
+        }
+        .onAppear {
+            withAnimation(.spring(response: 0.6, dampingFraction: 0.8, blendDuration: 0)) {
+                scale = 1.0
+                rotation = 360
+                opacity = 1
+            }
+        }
+    }
+    
+    private func dismissAnimation() {
+        withAnimation(.easeOut(duration: 0.2)) {
+            scale = 0.5
+            opacity = 0
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            isPresented = false
+        }
+    }
+    
+    struct PatrioticBackground: View {
+        var body: some View {
+            GeometryReader { geometry in
+                ZStack {
+                    // Red stripes
+                    ForEach(0..<5) { i in
+                        Rectangle()
+                            .fill(Color.oldGloryRed)
+                            .frame(height: geometry.size.height / 13)
+                            .offset(y: CGFloat(i * 2) * geometry.size.height / 13)
+                    }
+                    
+                    // Blue canton
+                    Rectangle()
+                        .fill(Color.oldGloryBlue)
+                        .frame(width: geometry.size.width * 0.4, height: geometry.size.height * 7/13)
+                        .position(x: geometry.size.width * 0.2, y: geometry.size.height * 7/26)
+                    
+                    // Stars
+                    ForEach(0..<5) { row in
+                        ForEach(0..<4) { col in
+                            Image(systemName: "star.fill")
+                                .foregroundColor(.white)
+                                .font(.system(size: 12))
+                                .position(
+                                    x: geometry.size.width * (0.05 + Double(col) * 0.1),
+                                    y: geometry.size.height * (0.05 + Double(row) * 0.1)
+                                )
+                        }
+                    }
+                }
+            }
+            .opacity(0.2) // Make the background subtle
+        }
     }
 }
 

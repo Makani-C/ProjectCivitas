@@ -8,9 +8,9 @@
 import Foundation
 
 let sampleComments = [
-    Comment(user: "John Doe", text: "This bill seems promising.", timestamp: Date().addingTimeInterval(-86400), replies: [], parentId: nil),
-    Comment(user: "Jane Smith", text: "I have concerns about Section 3.", timestamp: Date().addingTimeInterval(-43200), replies: [], parentId: nil),
-    Comment(user: "Bob Vance", text: "How will this affect small businesses?", timestamp: Date().addingTimeInterval(-21600), replies: [], parentId: nil)
+    Comment(user: "John Doe", text: "This bill seems promising.", timestamp: Date().addingTimeInterval(-86400), parentId: nil, replies: []),
+    Comment(user: "Jane Smith", text: "I have concerns about Section 3.", timestamp: Date().addingTimeInterval(-43200), parentId: nil, replies: []),
+    Comment(user: "Bob Vance", text: "How will this affect small businesses?", timestamp: Date().addingTimeInterval(-21600), parentId: nil, replies: [])
 ]
 
 let sampleBills = [

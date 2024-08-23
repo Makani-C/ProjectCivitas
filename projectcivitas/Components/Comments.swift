@@ -84,7 +84,7 @@ struct AddCommentModal: View {
     }
     
     private func submitComment() {
-        let newComment = Comment(user: "CurrentUser", text: commentText, timestamp: Date(), parentId: parentId)
+        let newComment = Comment(user: "CurrentUser", text: commentText, timestamp: Date(), parentId: parentId, replies: [])
         
         if let parentId = parentId {
             addReply(newComment, to: parentId)

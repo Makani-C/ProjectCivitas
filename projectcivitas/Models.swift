@@ -47,8 +47,21 @@ struct Comment: Identifiable {
     let user: String
     let text: String
     let timestamp: Date
-    var replies: [Comment] = []
-    let parentId: UUID? // nil for top-level comments
+    let parentId: UUID?
+    var replies: [Comment]
+//    var upvotes: Int
+//    var downvotes: Int
+//    
+//    init(id: UUID = UUID(), user: String, text: String, timestamp: Date, parentId: UUID? = nil, replies: [Comment] = [], upvotes: Int = 0, downvotes: Int = 0) {
+//        self.id = id
+//        self.user = user
+//        self.text = text
+//        self.timestamp = timestamp
+//        self.parentId = parentId
+//        self.replies = replies
+//        self.upvotes = upvotes
+//        self.downvotes = downvotes
+//    }
 }
 
 struct Filters {
