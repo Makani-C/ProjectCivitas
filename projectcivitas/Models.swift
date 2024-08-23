@@ -7,9 +7,12 @@
 
 import Foundation
 
+enum Vote: String {
+    case yes, no
+}
 
 struct Bill: Identifiable {
-    let id = UUID()
+    let id: UUID
     let title: String
     let description: String
     let state: String
@@ -22,8 +25,19 @@ struct Bill: Identifiable {
     var userVote: Vote?
     var comments: [Comment]
     
-    enum Vote {
-        case yes, no
+    init(id: UUID = UUID(), title: String, description: String, state: String, body: String, session: String, tags: [String], briefing: String, yesVotes: Int, noVotes: Int, userVote: Vote?, comments: [Comment]) {
+        self.id = id
+        self.title = title
+        self.description = description
+        self.state = state
+        self.body = body
+        self.session = session
+        self.tags = tags
+        self.briefing = briefing
+        self.yesVotes = yesVotes
+        self.noVotes = noVotes
+        self.userVote = userVote
+        self.comments = comments
     }
 }
 
@@ -50,7 +64,6 @@ struct Filters {
     }
 }
 
-
 struct Legislator: Identifiable {
     let id = UUID()
     let name: String
@@ -64,6 +77,17 @@ struct Legislator: Identifiable {
     let contactInfo: ContactInfo
     let socialMedia: SocialMedia
     let votingRecord: [VotingRecord]
+    
+    func alignmentScore(with userVotes: [UUID: Vote]) -> Double {
+        let matchingVotes = votingRecord.filter { record in
+            guard let userVote = userVotes[record.billId] else {
+                return false
+            }
+            return record.vote == userVote
+        }
+        
+        return Double(matchingVotes.count) / Double(votingRecord.count) * 100
+    }
 }
 
 struct ContactInfo {
@@ -80,7 +104,7 @@ struct SocialMedia {
 
 struct VotingRecord: Identifiable {
     let id = UUID()
-    let billTitle: String
-    let vote: String
+    let billId: UUID
+    let vote: Vote
     let date: Date
 }

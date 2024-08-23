@@ -367,7 +367,7 @@ struct VoteDistributionBar: View {
                 ZStack {
                     Rectangle()
                         .fill(Color.gray.opacity(0.3))
-                    Text("No votes yet")
+                    Text("No citizen votes yet")
                         .font(.caption.bold())
                         .foregroundColor(.gray)
                 }
@@ -801,12 +801,16 @@ struct LegislatorRow: View {
 
 struct LegislatorDetailPage: View {
     let legislator: Legislator
+    @EnvironmentObject var votingManager: VotingManager
+    @EnvironmentObject var userVotingRecord: UserVotingRecord
     
     var body: some View {
         VStack(spacing: 0) {
             legislatorHeader
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
+                    Text("Alignment Score: \(String(format: "%.1f", legislator.alignmentScore(with: userVotingRecord.votes)))%")
+                        .font(.headline)
                     infoSection(title: "Top Issues") {
                         ForEach(legislator.topIssues, id: \.self) { issue in
                             Text("• \(issue)")
@@ -834,10 +838,16 @@ struct LegislatorDetailPage: View {
                     infoSection(title: "Recent Voting Record") {
                         ForEach(legislator.votingRecord.prefix(5)) { record in
                             VStack(alignment: .leading, spacing: 4) {
-                                Text(record.billTitle)
-                                    .font(.subheadline)
+                                if let bill = votingManager.bills.first(where: { $0.id == record.billId }) {
+                                    Text(bill.title)
+                                        .font(.subheadline)
+                                } else {
+                                    Text("Unknown Bill")
+                                        .font(.subheadline)
+                                        .foregroundColor(.secondary)
+                                }
                                 HStack {
-                                    Text("Vote: \(record.vote)")
+                                    Text("Vote: \(record.vote.rawValue)")
                                     Spacer()
                                     Text(record.date, formatter: itemFormatter)
                                 }
@@ -1048,7 +1058,14 @@ struct FilterChip: View {
 }
 
 struct ContentView: View {
-    @StateObject private var votingManager = VotingManager(bills: sampleBills)
+    @StateObject private var userVotingRecord = UserVotingRecord()
+    @StateObject private var votingManager: VotingManager
+    
+    init() {
+        let userVotingRecord = UserVotingRecord()
+        self._votingManager = StateObject(wrappedValue: VotingManager(bills: sampleBills, userVotingRecord: userVotingRecord))
+        self._userVotingRecord = StateObject(wrappedValue: userVotingRecord)
+    }
     
     var body: some View {
         TabView {
@@ -1060,6 +1077,7 @@ struct ContentView: View {
                 .tabItem { Label("Settings", systemImage: "gear") }
         }
         .environmentObject(votingManager)
+        .environmentObject(userVotingRecord)
     }
 }
 

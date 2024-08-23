@@ -7,19 +7,21 @@
 
 import Foundation
 
-
 class VotingManager: ObservableObject {
     @Published var bills: [Bill]
+    @Published var userVotingRecord: UserVotingRecord
     
-    init(bills: [Bill]) {
+    init(bills: [Bill], userVotingRecord: UserVotingRecord = UserVotingRecord()) {
         self.bills = bills
+        self.userVotingRecord = userVotingRecord
     }
     
-    func vote(for bill: Bill, vote: Bill.Vote) {
+    func vote(for bill: Bill, vote: Vote) {
         if let index = bills.firstIndex(where: { $0.id == bill.id }) {
             if bills[index].userVote == vote {
                 // Retract vote
                 bills[index].userVote = nil
+                userVotingRecord.votes.removeValue(forKey: bill.id)
                 if vote == .yes {
                     bills[index].yesVotes -= 1
                 } else {
@@ -35,6 +37,7 @@ class VotingManager: ObservableObject {
                     }
                 }
                 bills[index].userVote = vote
+                userVotingRecord.recordVote(for: bill.id, vote: vote)
                 if vote == .yes {
                     bills[index].yesVotes += 1
                 } else {
@@ -42,5 +45,13 @@ class VotingManager: ObservableObject {
                 }
             }
         }
+    }
+}
+
+class UserVotingRecord: ObservableObject {
+    @Published var votes: [UUID: Vote] = [:]
+    
+    func recordVote(for billId: UUID, vote: Vote) {
+        votes[billId] = vote
     }
 }

@@ -15,6 +15,7 @@ let sampleComments = [
 
 let sampleBills = [
     Bill(
+        id: UUID(),
         title: "House Joint Resolution 11",
         description: "Constitutional amendment for Congressional term limits",
         state: "US",
@@ -28,6 +29,8 @@ let sampleBills = [
         comments: sampleComments
     ),
     Bill(
+        
+        id: UUID(),
         title: "Senate Bill 5047",
         description: "Enhances the Washington Voting Rights Act",
         state: "WA",
@@ -41,6 +44,8 @@ let sampleBills = [
         comments: []
     ),
     Bill(
+        
+        id: UUID(),
         title: "House Bill 1001",
         description: "Audiology and Speech-Language Pathology Interstate Compact",
         state: "WA",
@@ -53,54 +58,62 @@ let sampleBills = [
         userVote: nil,
         comments: []
     ),
-    Bill(title: "House Bill 1002",
-         description: "Increases the penalty for hazing",
-         state: "WA",
-         body: "House",
-         session: "2023",
-         tags: ["Education", "Criminal Justice"],
-         briefing: "This bill proposes increasing penalties for hazing incidents.",
-         yesVotes: 120,
-         noVotes: 80,
-         userVote: nil,
-         comments: []
-        ),
-    Bill(title: "Senate Bill 5020",
-         description: "Proposes changing the starting age for elementary education to six years old",
-         state: "WA",
-         body: "Senate",
-         session: "2023",
-         tags: ["Education"],
-         briefing: "This bill proposes changing the starting age for elementary education to six years old.",
-         yesVotes: 120,
-         noVotes: 80,
-         userVote: nil,
-         comments: []
-        ),
-    Bill(title: "House Resolution 503",
-         description: "Proposes articles of impeachment against President Biden",
-         state: "US",
-         body: "House of Representatives",
-         session: "2023",
-         tags: ["Federal", "Impeachment"],
-         briefing: "This resolution proposes articles of impeachment against President Biden.",
-         yesVotes: 120,
-         noVotes: 80,
-         userVote: nil,
-         comments: []
-        ),
-    Bill(title: "Senate Bill 1323",
-         description: "Provides for banking for cannabis companies",
-         state: "US",
-         body: "Senate",
-         session: "2023",
-         tags: ["Banking", "Cannabis"],
-         briefing: "This bill aims to provide banking services for cannabis companies.",
-         yesVotes: 120,
-         noVotes: 80,
-         userVote: nil,
-         comments: []
-        ),
+    Bill(
+        id: UUID(),
+        title: "House Bill 1002",
+        description: "Increases the penalty for hazing",
+        state: "WA",
+        body: "House",
+        session: "2023",
+        tags: ["Education", "Criminal Justice"],
+        briefing: "This bill proposes increasing penalties for hazing incidents.",
+        yesVotes: 120,
+        noVotes: 80,
+        userVote: nil,
+        comments: []
+    ),
+    Bill(
+        id: UUID(),
+        title: "Senate Bill 5020",
+        description: "Proposes changing the starting age for elementary education to six years old",
+        state: "WA",
+        body: "Senate",
+        session: "2023",
+        tags: ["Education"],
+        briefing: "This bill proposes changing the starting age for elementary education to six years old.",
+        yesVotes: 120,
+        noVotes: 80,
+        userVote: nil,
+        comments: []
+    ),
+    Bill(
+        id: UUID(),
+        title: "House Resolution 503",
+        description: "Proposes articles of impeachment against President Biden",
+        state: "US",
+        body: "House of Representatives",
+        session: "2023",
+        tags: ["Federal", "Impeachment"],
+        briefing: "This resolution proposes articles of impeachment against President Biden.",
+        yesVotes: 120,
+        noVotes: 80,
+        userVote: nil,
+        comments: []
+    ),
+    Bill(
+        id: UUID(),
+        title: "Senate Bill 1323",
+        description: "Provides for banking for cannabis companies",
+        state: "US",
+        body: "Senate",
+        session: "2023",
+        tags: ["Banking", "Cannabis"],
+        briefing: "This bill aims to provide banking services for cannabis companies.",
+        yesVotes: 120,
+        noVotes: 80,
+        userVote: nil,
+        comments: []
+    ),
 ]
 
 let sampleLegislators = [
@@ -124,9 +137,10 @@ let sampleLegislators = [
             instagram: "repjohnsmith"
         ),
         votingRecord: [
-            VotingRecord(billTitle: "H.R. 1 - For the People Act", vote: "Yea", date: Date()),
-            VotingRecord(billTitle: "H.R. 3 - Lower Drug Costs Now Act", vote: "Yea", date: Date().addingTimeInterval(-86400)),
-            // Add more voting records...
+            VotingRecord(billId: sampleBills[0].id, vote: .yes, date: Date()),
+            VotingRecord(billId: sampleBills[1].id, vote: .no, date: Date().addingTimeInterval(-86400)),
+            VotingRecord(billId: sampleBills[2].id, vote: .yes, date: Date().addingTimeInterval(-172800)),
+            // Add more voting records as needed...
         ]
     ),
 ]
