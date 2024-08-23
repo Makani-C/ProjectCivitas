@@ -1,8 +1,5 @@
 //
-//  Styles.swift
-//  projectcivitas
-//
-//  Created by Makani Cartwright on 8/22/24.
+//  Colors.swift
 //
 
 import Foundation
@@ -41,26 +38,3 @@ extension Color {
         )
     }
 }
-
-struct CustomDivider: View {
-    var body: some View {
-        Rectangle()
-            .fill(Color.oldGloryRed)
-            .frame(height: 1)
-    }
-}
-
-
-struct PrimaryButtonStyle: ButtonStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .foregroundColor(.white)
-            .frame(maxWidth: .infinity)
-            .padding()
-            .background(Color.red)
-            .cornerRadius(16)
-            .font(.title3)
-            .bold()
-    }
-}
-

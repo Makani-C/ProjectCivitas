@@ -8,18 +8,14 @@
 import Foundation
 import Combine
 
-struct LegislatorFilters {
-    var parties: Set<String> = []
-    var states: Set<String> = []
-    var chambers: Set<String> = []
-    
-    var isEmpty: Bool {
-        parties.isEmpty && states.isEmpty && chambers.isEmpty
-    }
-    
-    var count: Int {
-        parties.count + states.count + chambers.count
-    }
+enum SortOrder {
+    case ascending, descending
+}
+
+struct FilterCategory<T> {
+    let name: String
+    let key: String
+    let values: [String]
 }
 
 class FilterManager<T>: ObservableObject {
@@ -72,8 +68,4 @@ class FilterManager<T>: ObservableObject {
     func toggleSortOrder() {
         sortOrder = sortOrder == .ascending ? .descending : .ascending
     }
-}
-
-enum SortOrder {
-    case ascending, descending
 }

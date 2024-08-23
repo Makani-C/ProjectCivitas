@@ -7,7 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		12727C642C78E03C00FD1C91 /* Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12727C632C78E03C00FD1C91 /* Components.swift */; };
+		12727C692C78F88D00FD1C91 /* Buttons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12727C682C78F88D00FD1C91 /* Buttons.swift */; };
+		12727C6B2C78F8BD00FD1C91 /* Chips.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12727C6A2C78F8BD00FD1C91 /* Chips.swift */; };
 		12A72EF32C77D85A00865382 /* projectcivitasApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12A72EF22C77D85A00865382 /* projectcivitasApp.swift */; };
 		12A72EF52C77D85A00865382 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12A72EF42C77D85A00865382 /* ContentView.swift */; };
 		12A72EF72C77D85B00865382 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 12A72EF62C77D85B00865382 /* Assets.xcassets */; };
@@ -16,7 +17,7 @@
 		12A72F0E2C77D85B00865382 /* projectcivitasUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12A72F0D2C77D85B00865382 /* projectcivitasUITests.swift */; };
 		12A72F102C77D85B00865382 /* projectcivitasUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12A72F0F2C77D85B00865382 /* projectcivitasUITestsLaunchTests.swift */; };
 		12D4CC0C2C780B6F0099D272 /* SampleData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12D4CC0B2C780B6F0099D272 /* SampleData.swift */; };
-		12D4CC0E2C780BA30099D272 /* Styles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12D4CC0D2C780BA30099D272 /* Styles.swift */; };
+		12D4CC0E2C780BA30099D272 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12D4CC0D2C780BA30099D272 /* Colors.swift */; };
 		12D4CC102C780BF00099D272 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12D4CC0F2C780BF00099D272 /* Models.swift */; };
 		12D4CC122C780E600099D272 /* VoteManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12D4CC112C780E600099D272 /* VoteManager.swift */; };
 		12D4CC142C780EAC0099D272 /* Filters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12D4CC132C780EAC0099D272 /* Filters.swift */; };
@@ -42,7 +43,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		12727C632C78E03C00FD1C91 /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Components.swift; path = ../Components.swift; sourceTree = "<group>"; };
+		12727C682C78F88D00FD1C91 /* Buttons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Buttons.swift; sourceTree = "<group>"; };
+		12727C6A2C78F8BD00FD1C91 /* Chips.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Chips.swift; sourceTree = "<group>"; };
 		12A72EEF2C77D85A00865382 /* projectcivitas.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = projectcivitas.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		12A72EF22C77D85A00865382 /* projectcivitasApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = projectcivitasApp.swift; sourceTree = "<group>"; };
 		12A72EF42C77D85A00865382 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -54,7 +56,7 @@
 		12A72F0D2C77D85B00865382 /* projectcivitasUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = projectcivitasUITests.swift; sourceTree = "<group>"; };
 		12A72F0F2C77D85B00865382 /* projectcivitasUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = projectcivitasUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		12D4CC0B2C780B6F0099D272 /* SampleData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleData.swift; sourceTree = "<group>"; };
-		12D4CC0D2C780BA30099D272 /* Styles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Styles.swift; sourceTree = "<group>"; };
+		12D4CC0D2C780BA30099D272 /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
 		12D4CC0F2C780BF00099D272 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		12D4CC112C780E600099D272 /* VoteManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoteManager.swift; sourceTree = "<group>"; };
 		12D4CC132C780EAC0099D272 /* Filters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Filters.swift; sourceTree = "<group>"; };
@@ -87,6 +89,50 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		12727C652C78F81900FD1C91 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				12A72EF22C77D85A00865382 /* projectcivitasApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		12727C672C78F86200FD1C91 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				12727C682C78F88D00FD1C91 /* Buttons.swift */,
+				12727C6A2C78F8BD00FD1C91 /* Chips.swift */,
+				12D4CC132C780EAC0099D272 /* Filters.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		12727C6C2C78F9F900FD1C91 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				12A72EF62C77D85B00865382 /* Assets.xcassets */,
+				12D4CC0B2C780B6F0099D272 /* SampleData.swift */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		12727C6D2C78FA4D00FD1C91 /* Managers */ = {
+			isa = PBXGroup;
+			children = (
+				12F54F5D2C7840040023E67F /* SettingsManager.swift */,
+				12D4CC112C780E600099D272 /* VoteManager.swift */,
+			);
+			path = Managers;
+			sourceTree = "<group>";
+		};
+		12727C6E2C78FA7D00FD1C91 /* Styles */ = {
+			isa = PBXGroup;
+			children = (
+				12D4CC0D2C780BA30099D272 /* Colors.swift */,
+			);
+			path = Styles;
+			sourceTree = "<group>";
+		};
 		12A72EE62C77D85A00865382 = {
 			isa = PBXGroup;
 			children = (
@@ -110,16 +156,13 @@
 		12A72EF12C77D85A00865382 /* projectcivitas */ = {
 			isa = PBXGroup;
 			children = (
-				12A72EF62C77D85B00865382 /* Assets.xcassets */,
-				12A72EF22C77D85A00865382 /* projectcivitasApp.swift */,
-				12727C632C78E03C00FD1C91 /* Components.swift */,
 				12A72EF42C77D85A00865382 /* ContentView.swift */,
-				12D4CC132C780EAC0099D272 /* Filters.swift */,
 				12D4CC0F2C780BF00099D272 /* Models.swift */,
-				12D4CC0B2C780B6F0099D272 /* SampleData.swift */,
-				12F54F5D2C7840040023E67F /* SettingsManager.swift */,
-				12D4CC0D2C780BA30099D272 /* Styles.swift */,
-				12D4CC112C780E600099D272 /* VoteManager.swift */,
+				12727C652C78F81900FD1C91 /* App */,
+				12727C672C78F86200FD1C91 /* Components */,
+				12727C6D2C78FA4D00FD1C91 /* Managers */,
+				12727C6C2C78F9F900FD1C91 /* Resources */,
+				12727C6E2C78FA7D00FD1C91 /* Styles */,
 				12A72EF82C77D85B00865382 /* Preview Content */,
 			);
 			path = projectcivitas;
@@ -283,13 +326,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				12D4CC142C780EAC0099D272 /* Filters.swift in Sources */,
-				12D4CC0E2C780BA30099D272 /* Styles.swift in Sources */,
+				12D4CC0E2C780BA30099D272 /* Colors.swift in Sources */,
 				12A72EF52C77D85A00865382 /* ContentView.swift in Sources */,
 				12D4CC102C780BF00099D272 /* Models.swift in Sources */,
 				12A72EF32C77D85A00865382 /* projectcivitasApp.swift in Sources */,
+				12727C6B2C78F8BD00FD1C91 /* Chips.swift in Sources */,
+				12727C692C78F88D00FD1C91 /* Buttons.swift in Sources */,
 				12D4CC0C2C780B6F0099D272 /* SampleData.swift in Sources */,
 				12D4CC122C780E600099D272 /* VoteManager.swift in Sources */,
-				12727C642C78E03C00FD1C91 /* Components.swift in Sources */,
 				12F54F5E2C7840040023E67F /* SettingsManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

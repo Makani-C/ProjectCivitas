@@ -2,10 +2,6 @@ import SwiftUI
 
 // MARK: - Bill Views
 
-import SwiftUI
-
-// MARK: - Bill Views
-
 struct BillListPage: View {
     @EnvironmentObject var votingManager: VotingManager
     @StateObject private var filterManager = FilterManager<Bill>(
@@ -708,6 +704,7 @@ struct LegislatorDetailPage: View {
     }()
 }
 
+// MARK: - UserSettings
 
 struct UserSettingsView: View {
     @StateObject private var settingsManager = SettingsManager()
@@ -923,12 +920,6 @@ struct FilteredList<T>: View {
             .cornerRadius(8)
         }
     }
-}
-
-struct FilterCategory<T> {
-    let name: String
-    let key: String
-    let values: [String]
 }
 
 
