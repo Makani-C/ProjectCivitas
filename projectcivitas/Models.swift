@@ -8,7 +8,8 @@
 import Foundation
 
 enum Vote: String {
-    case yes, no, abstain, notPresent}
+    case yes, no, abstain, notPresent
+}
 
 struct Bill: Identifiable {
     let id: UUID
@@ -23,58 +24,10 @@ struct Bill: Identifiable {
     var noVotes: Int
     var userVote: Vote?
     var comments: [Comment]
-    var lastUpdated: Date
+    let lastUpdated: Date
     
-    init(id: UUID = UUID(), title: String, description: String, state: String, body: String, session: String, tags: [String], briefing: String, yesVotes: Int, noVotes: Int, userVote: Vote?, comments: [Comment], lastUpdated: Date) {
-        self.id = id
-        self.title = title
-        self.description = description
-        self.state = state
-        self.body = body
-        self.session = session
-        self.tags = tags
-        self.briefing = briefing
-        self.yesVotes = yesVotes
-        self.noVotes = noVotes
-        self.userVote = userVote
-        self.comments = comments
-        self.lastUpdated = lastUpdated
-    }
-}
-
-struct Comment: Identifiable {
-    let id = UUID()
-    let user: String
-    let text: String
-    let timestamp: Date
-    let parentId: UUID?
-    var replies: [Comment]
-//    var upvotes: Int
-//    var downvotes: Int
-//    
-//    init(id: UUID = UUID(), user: String, text: String, timestamp: Date, parentId: UUID? = nil, replies: [Comment] = [], upvotes: Int = 0, downvotes: Int = 0) {
-//        self.id = id
-//        self.user = user
-//        self.text = text
-//        self.timestamp = timestamp
-//        self.parentId = parentId
-//        self.replies = replies
-//        self.upvotes = upvotes
-//        self.downvotes = downvotes
-//    }
-}
-
-struct Filters {
-    var tags: Set<String> = []
-    var sessions: Set<String> = []
-    var bodies: Set<String> = []
-    
-    var isEmpty: Bool {
-        tags.isEmpty && sessions.isEmpty && bodies.isEmpty
-    }
-    
-    var count: Int {
-        tags.count + sessions.count + bodies.count
+    var totalCommentCount: Int {
+        comments.reduce(0) { $0 + $1.totalReplyCount + 1 }
     }
 }
 
@@ -86,7 +39,6 @@ struct Legislator: Identifiable {
     let district: String?
     let chamber: String
     let imageUrl: String
-    let biography: String
     let topIssues: [String]
     let contactInfo: ContactInfo
     let socialMedia: SocialMedia

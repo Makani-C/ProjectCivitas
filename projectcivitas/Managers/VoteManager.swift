@@ -1,49 +1,64 @@
-//
-//  VoteManager.swift
-//  projectcivitas
-//
-//  Created by Makani Cartwright on 8/22/24.
-//
-
 import Foundation
 
 class VotingManager: ObservableObject {
-    @Published var bills: [Bill]
-    @Published var userVotingRecord: UserVotingRecord
+    @Published private(set) var bills: [Bill] = []
+    private let dataSource: DataAccessLayer
+    private let userVotingRecord: UserVotingRecord
     
-    init(bills: [Bill], userVotingRecord: UserVotingRecord = UserVotingRecord()) {
-        self.bills = bills
+    init(dataSource: DataAccessLayer, userVotingRecord: UserVotingRecord) {
+        self.dataSource = dataSource
         self.userVotingRecord = userVotingRecord
+        
+        Task {
+            await fetchBills()
+        }
+    }
+    
+    @MainActor
+    func fetchBills() async {
+        do {
+            bills = try await dataSource.fetchBills()
+        } catch {
+            print("Error fetching bills: \(error)")
+        }
     }
     
     func vote(for bill: Bill, vote: Vote) {
-        if let index = bills.firstIndex(where: { $0.id == bill.id }) {
-            if bills[index].userVote == vote {
-                // Retract vote
-                bills[index].userVote = nil
-                userVotingRecord.votes.removeValue(forKey: bill.id)
-                if vote == .yes {
-                    bills[index].yesVotes -= 1
-                } else {
-                    bills[index].noVotes -= 1
-                }
-            } else {
-                // Change vote or add new vote
-                if let previousVote = bills[index].userVote {
-                    if previousVote == .yes {
-                        bills[index].yesVotes -= 1
-                    } else {
-                        bills[index].noVotes -= 1
-                    }
-                }
-                bills[index].userVote = vote
-                userVotingRecord.recordVote(for: bill.id, vote: vote)
-                if vote == .yes {
-                    bills[index].yesVotes += 1
-                } else {
-                    bills[index].noVotes += 1
-                }
+        Task {
+            await updateVote(for: bill, vote: vote)
+        }
+    }
+    
+    @MainActor
+    private func updateVote(for bill: Bill, vote: Vote) async {
+        guard let index = bills.firstIndex(where: { $0.id == bill.id }) else { return }
+        
+        var updatedBill = bills[index]
+        
+        if let previousVote = updatedBill.userVote {
+            if previousVote == .yes {
+                updatedBill.yesVotes -= 1
+            } else if previousVote == .no {
+                updatedBill.noVotes -= 1
             }
+        }
+        
+        updatedBill.userVote = vote
+        
+        if vote == .yes {
+            updatedBill.yesVotes += 1
+        } else if vote == .no {
+            updatedBill.noVotes += 1
+        }
+        
+        bills[index] = updatedBill
+        userVotingRecord.recordVote(billId: bill.id, vote: vote)
+        
+        do {
+            try await dataSource.updateBill(updatedBill)
+        } catch {
+            print("Error updating bill: \(error)")
+            // You might want to implement some error handling or rollback logic here
         }
     }
 }
@@ -51,7 +66,7 @@ class VotingManager: ObservableObject {
 class UserVotingRecord: ObservableObject {
     @Published var votes: [UUID: Vote] = [:]
     
-    func recordVote(for billId: UUID, vote: Vote) {
+    func recordVote(billId: UUID, vote: Vote) {
         votes[billId] = vote
     }
 }

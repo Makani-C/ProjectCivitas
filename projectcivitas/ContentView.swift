@@ -36,10 +36,10 @@ struct FeedView: View {
         ),
         FeedItem(
             title: "Legislator Vote",
-            description: "Your Senator, John Smith has voted on a bill you were following",
+            description: "Your Congressperson has voted on a bill you were following",
             date: Date(),
             associatedItems: [
-                AssociatedItem(type: .legislator, itemId: sampleLegislators[0].id, title: sampleLegislators[0].name),
+                AssociatedItem(type: .legislator, itemId: sampleLegislators[4].id, title: sampleLegislators[4].name),
             ],
             tags: ["California"]
         ),
@@ -535,7 +535,9 @@ struct BillDetailPage: View {
                     VStack(alignment: .leading, spacing: 16) {
                         citizenOpinionSection
                         votingSection
+                        Divider()
                         citizensBriefingSection
+                        Divider()
                         commentSection
                     }
                     .padding()
@@ -640,7 +642,9 @@ struct BillDetailPage: View {
     private var commentSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Text("Comments").font(.headline)
+                Text("Comments")
+                    .font(.headline)
+                    .fontWeight(.bold)
                 Spacer()
                 Button("Add Comment") { showingAddComment = true }
             }
@@ -712,12 +716,14 @@ struct LegislatorDetailPage: View {
     let legislator: Legislator
     @EnvironmentObject var votingManager: VotingManager
     @EnvironmentObject var userVotingRecord: UserVotingRecord
+    @EnvironmentObject var settingsManager: SettingsManager
     
     var body: some View {
         VStack(spacing: 0) {
             legislatorHeader
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
+                    followButton
                     ScoreSection(attendanceScore: legislator.attendanceScore(),
                                  alignmentScore: legislator.alignmentScore(with: userVotingRecord.votes))
                     InfoSection("Top Issues") {
@@ -726,7 +732,7 @@ struct LegislatorDetailPage: View {
                     ContactInfoSection(contactInfo: legislator.contactInfo)
                     SocialMediaSection(socialMedia: legislator.socialMedia)
                     VotingRecordSection(votingRecord: legislator.votingRecord, votingManager: votingManager)
-                    FundingRecordSection(fundingRecord: legislator.fundingRecord) // New section
+                    FundingRecordSection(fundingRecord: legislator.fundingRecord)
                 }
                 .padding()
             }
@@ -734,6 +740,18 @@ struct LegislatorDetailPage: View {
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
         .navigationBarItems(leading: BackButton())
+    }
+    
+    private var followButton: some View {
+        Button(action: {
+            settingsManager.userProfile.toggleFollowLegislator(legislator.id)
+        }) {
+            Text(settingsManager.userProfile.isFollowing(legislator.id) ? "Unfollow" : "Follow")
+                .padding()
+                .background(Color.oldGloryBlue)
+                .foregroundColor(.white)
+                .cornerRadius(8)
+        }
     }
     
     private var legislatorHeader: some View {
@@ -1282,10 +1300,12 @@ struct FilteredList<T>: View {
 struct ContentView: View {
     @StateObject private var userVotingRecord = UserVotingRecord()
     @StateObject private var votingManager: VotingManager
+    @StateObject private var settingsManager = SettingsManager()
     
     init() {
+        let dataSource = MockDataSource() // Use MockDataSource for now
         let userVotingRecord = UserVotingRecord()
-        self._votingManager = StateObject(wrappedValue: VotingManager(bills: sampleBills, userVotingRecord: userVotingRecord))
+        self._votingManager = StateObject(wrappedValue: VotingManager(dataSource: dataSource, userVotingRecord: userVotingRecord))
         self._userVotingRecord = StateObject(wrappedValue: userVotingRecord)
     }
     
@@ -1300,8 +1320,10 @@ struct ContentView: View {
         }
         .environmentObject(votingManager)
         .environmentObject(userVotingRecord)
+        .environmentObject(settingsManager)
     }
 }
+
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {

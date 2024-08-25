@@ -8,9 +8,62 @@
 import Foundation
 
 let sampleComments = [
-    Comment(user: "John Doe", text: "This bill seems promising.", timestamp: Date().addingTimeInterval(-86400), parentId: nil, replies: []),
-    Comment(user: "Jane Smith", text: "I have concerns about Section 3.", timestamp: Date().addingTimeInterval(-43200), parentId: nil, replies: []),
-    Comment(user: "Bob Vance", text: "How will this affect small businesses?", timestamp: Date().addingTimeInterval(-21600), parentId: nil, replies: [])
+    Comment(
+        user: "John Doe",
+        text: "This bill seems promising. I particularly like the focus on environmental protection.",
+        timestamp: Date().addingTimeInterval(-86400),
+        parentId: nil,
+        replies: [
+            Comment(
+                user: "Jane Smith",
+                text: "I agree, but I'm concerned about the potential economic impact. Has there been an analysis?",
+                timestamp: Date().addingTimeInterval(-82800),
+                parentId: nil,
+                replies: [],
+                upvotes: 5,
+                userHasUpvoted: false
+            ),
+            Comment(
+                user: "Bob Johnson",
+                text: "Good point, Jane. I'd also like to see more details on implementation timelines.",
+                timestamp: Date().addingTimeInterval(-79200),
+                parentId: nil,
+                replies: [],
+                upvotes: 2,
+                userHasUpvoted: false
+            )
+        ],
+        upvotes: 10,
+        userHasUpvoted: false
+    ),
+    Comment(
+        user: "Alice Brown",
+        text: "I have concerns about Section 3. It seems too vague and could lead to misinterpretation.",
+        timestamp: Date().addingTimeInterval(-72000),
+        parentId: nil,
+        replies: [
+            Comment(
+                user: "Charlie Davis",
+                text: "I see your point, Alice. Perhaps we should suggest more specific language for that section.",
+                timestamp: Date().addingTimeInterval(-68400),
+                parentId: nil,
+                replies: [],
+                upvotes: 3,
+                userHasUpvoted: false
+            )
+        ],
+        upvotes: 7,
+        userHasUpvoted: false
+    ),
+    Comment(
+        user: "Eva Wilson",
+        text: "How will this bill affect small businesses? I'm worried it might impose too much of a burden.",
+        timestamp: Date().addingTimeInterval(-57600),
+        parentId: nil,
+        replies: [],
+        upvotes: 8,
+        userHasUpvoted: false
+    )
 ]
 
 let sampleBills = [
@@ -127,12 +180,11 @@ let sampleLegislators = [
     Legislator(
         name: "John Smith",
         party: "Democrat",
-        state: "California",
-        district: "12th",
+        state: "WA",
+        district: "98th",
         chamber: "House of Representatives",
         imageUrl: "https://example.com/john_smith.jpg",
-        biography: "John Smith has served in the House of Representatives since 2015...",
-        topIssues: ["Climate Change", "Healthcare Reform", "Education"],
+        topIssues: ["Labor", "Education"],
         contactInfo: ContactInfo(
             email: "john.smith@house.gov",
             phone: "(202) 555-0123",
@@ -156,23 +208,22 @@ let sampleLegislators = [
         ]
     ),
     Legislator(
-        name: "John Smith",
+        name: "Jane Doe",
         party: "Democrat",
-        state: "California",
-        district: "12th",
+        state: "WA",
+        district: "99th",
         chamber: "House of Representatives",
         imageUrl: "https://example.com/john_smith.jpg",
-        biography: "John Smith has served in the House of Representatives since 2015...",
-        topIssues: ["Climate Change", "Healthcare Reform", "Education"],
+        topIssues: ["Climate Change", "Healthcare Reform"],
         contactInfo: ContactInfo(
-            email: "john.smith@house.gov",
+            email: "jane.doe@house.gov",
             phone: "(202) 555-0123",
             office: "123 Capitol Hill, Washington D.C."
         ),
         socialMedia: SocialMedia(
-            twitter: "repjohnsmith",
-            facebook: "RepJohnSmith",
-            instagram: "repjohnsmith"
+            twitter: "repJaneDoe",
+            facebook: "repJaneDoe",
+            instagram: "repJaneDoe"
         ),
         votingRecord: [
             VotingRecord(billId: sampleBills[0].id, vote: .yes, date: Date()),
@@ -187,23 +238,22 @@ let sampleLegislators = [
         ]
     ),
     Legislator(
-        name: "John Smith",
-        party: "Democrat",
-        state: "California",
-        district: "12th",
-        chamber: "House of Representatives",
+        name: "Peter Abbarno",
+        party: "Republican",
+        state: "WA",
+        district: "20th",
+        chamber: "House",
         imageUrl: "https://example.com/john_smith.jpg",
-        biography: "John Smith has served in the House of Representatives since 2015...",
-        topIssues: ["Climate Change", "Healthcare Reform", "Education"],
+        topIssues: ["Public Safety", "Parental Rights"],
         contactInfo: ContactInfo(
-            email: "john.smith@house.gov",
-            phone: "(202) 555-0123",
+            email: "peter.abbarno@house.wa.gov",
+            phone: "(360) 000-0000",
             office: "123 Capitol Hill, Washington D.C."
         ),
         socialMedia: SocialMedia(
-            twitter: "repjohnsmith",
-            facebook: "RepJohnSmith",
-            instagram: "repjohnsmith"
+            twitter: "reppabb",
+            facebook: "reppabb",
+            instagram: "reppabb"
         ),
         votingRecord: [
             VotingRecord(billId: sampleBills[0].id, vote: .yes, date: Date()),
@@ -218,96 +268,87 @@ let sampleLegislators = [
         ]
     ),
     Legislator(
-        name: "John Smith",
-        party: "Democrat",
-        state: "California",
-        district: "12th",
-        chamber: "House of Representatives",
+        name: "Dan Newhouse",
+        party: "Republican",
+        state: "US",
+        district: "WA",
+        chamber: "House",
         imageUrl: "https://example.com/john_smith.jpg",
-        biography: "John Smith has served in the House of Representatives since 2015...",
-        topIssues: ["Climate Change", "Healthcare Reform", "Education"],
+        topIssues: ["Immigration", "Ukraine"],
         contactInfo: ContactInfo(
-            email: "john.smith@house.gov",
-            phone: "(202) 555-0123",
+            email: "dn@house.gov",
+            phone: "(360) 000-0003",
             office: "123 Capitol Hill, Washington D.C."
         ),
         socialMedia: SocialMedia(
-            twitter: "repjohnsmith",
-            facebook: "RepJohnSmith",
-            instagram: "repjohnsmith"
+            twitter: "repNewhouse",
+            facebook: "repNewhouse",
+            instagram: "repNewhouse"
         ),
-        votingRecord: [
-            VotingRecord(billId: sampleBills[0].id, vote: .yes, date: Date()),
-            VotingRecord(billId: sampleBills[1].id, vote: .no, date: Date().addingTimeInterval(-86400)),
-            VotingRecord(billId: sampleBills[2].id, vote: .yes, date: Date().addingTimeInterval(-172800)),
-            VotingRecord(billId: sampleBills[3].id, vote: .notPresent, date: Date().addingTimeInterval(-172800)),
-        ],
-        fundingRecord: [
-            FundingRecord(source: "Individual Contributions", amount: 500000, date: Date()),
-            FundingRecord(source: "PAC Contributions", amount: 250000, date: Date().addingTimeInterval(-86400)),
-            FundingRecord(source: "Self-Funding", amount: 100000, date: Date().addingTimeInterval(-172800))
-        ]
+        votingRecord: [],
+        fundingRecord: []
     ),
     Legislator(
-        name: "John Smith",
+        name: "Marie Glusenkamp-Perez",
         party: "Democrat",
-        state: "California",
-        district: "12th",
-        chamber: "House of Representatives",
+        state: "US",
+        district: "WA",
+        chamber: "House",
         imageUrl: "https://example.com/john_smith.jpg",
-        biography: "John Smith has served in the House of Representatives since 2015...",
-        topIssues: ["Climate Change", "Healthcare Reform", "Education"],
+        topIssues: ["Labor", "Immigration", "Infrastructure"],
         contactInfo: ContactInfo(
-            email: "john.smith@house.gov",
-            phone: "(202) 555-0123",
+            email: "mgp@house.gov",
+            phone: "(360) 000-0002",
             office: "123 Capitol Hill, Washington D.C."
         ),
         socialMedia: SocialMedia(
-            twitter: "repjohnsmith",
-            facebook: "RepJohnSmith",
-            instagram: "repjohnsmith"
+            twitter: "repmarieGP",
+            facebook: "repmarieGP",
+            instagram: "@repMarieGP"
         ),
-        votingRecord: [
-            VotingRecord(billId: sampleBills[0].id, vote: .yes, date: Date()),
-            VotingRecord(billId: sampleBills[1].id, vote: .no, date: Date().addingTimeInterval(-86400)),
-            VotingRecord(billId: sampleBills[2].id, vote: .yes, date: Date().addingTimeInterval(-172800)),
-            VotingRecord(billId: sampleBills[3].id, vote: .notPresent, date: Date().addingTimeInterval(-172800)),
-        ],
-        fundingRecord: [
-            FundingRecord(source: "Individual Contributions", amount: 500000, date: Date()),
-            FundingRecord(source: "PAC Contributions", amount: 250000, date: Date().addingTimeInterval(-86400)),
-            FundingRecord(source: "Self-Funding", amount: 100000, date: Date().addingTimeInterval(-172800))
-        ]
+        votingRecord: [],
+        fundingRecord: []
     ),
     Legislator(
-        name: "John Smith",
+        name: "Maria Cantwell",
         party: "Democrat",
-        state: "California",
-        district: "12th",
-        chamber: "House of Representatives",
+        state: "US",
+        district: "WA",
+        chamber: "Senate",
         imageUrl: "https://example.com/john_smith.jpg",
-        biography: "John Smith has served in the House of Representatives since 2015...",
         topIssues: ["Climate Change", "Healthcare Reform", "Education"],
         contactInfo: ContactInfo(
-            email: "john.smith@house.gov",
-            phone: "(202) 555-0123",
+            email: "maria.cantwell@congress.gov",
+            phone: "(360) 000-0001",
             office: "123 Capitol Hill, Washington D.C."
         ),
         socialMedia: SocialMedia(
-            twitter: "repjohnsmith",
-            facebook: "RepJohnSmith",
-            instagram: "repjohnsmith"
+            twitter: "senatorCantwell",
+            facebook: "senatorCantwell",
+            instagram: "@senatorCantwell"
         ),
-        votingRecord: [
-            VotingRecord(billId: sampleBills[0].id, vote: .yes, date: Date()),
-            VotingRecord(billId: sampleBills[1].id, vote: .no, date: Date().addingTimeInterval(-86400)),
-            VotingRecord(billId: sampleBills[2].id, vote: .yes, date: Date().addingTimeInterval(-172800)),
-            VotingRecord(billId: sampleBills[3].id, vote: .notPresent, date: Date().addingTimeInterval(-172800)),
-        ],
-        fundingRecord: [
-            FundingRecord(source: "Individual Contributions", amount: 500000, date: Date()),
-            FundingRecord(source: "PAC Contributions", amount: 250000, date: Date().addingTimeInterval(-86400)),
-            FundingRecord(source: "Self-Funding", amount: 100000, date: Date().addingTimeInterval(-172800))
-        ]
+        votingRecord: [],
+        fundingRecord: []
+    ),
+    Legislator(
+        name: "Patty Murray",
+        party: "Democrat",
+        state: "US",
+        district: "WA",
+        chamber: "Senate",
+        imageUrl: "https://example.com/john_smith.jpg",
+        topIssues: ["Climate Change", "Healthcare Reform", "Education"],
+        contactInfo: ContactInfo(
+            email: "patty.murray@congress.gov",
+            phone: "(360) 000-0000",
+            office: "123 Capitol Hill, Washington D.C."
+        ),
+        socialMedia: SocialMedia(
+            twitter: "senatorPMurray",
+            facebook: "senatorPMurray",
+            instagram: "@senatorMurray"
+        ),
+        votingRecord: [],
+        fundingRecord: []
     ),
 ]
