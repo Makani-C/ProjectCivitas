@@ -418,7 +418,7 @@ struct InfoSection<Content: View>: View {
         VStack(alignment: .leading, spacing: 8) {
             Text(title)
                 .font(.headline)
-                .foregroundColor(.primary)
+                .foregroundColor(.oldGloryRed)
             content
                 .font(.body)
                 .foregroundColor(.secondary)
@@ -584,7 +584,7 @@ struct BillDetailPage: View {
     
     private var citizenOpinionSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Citizens Opinion").font(.headline)
+            Text("Citizens Opinion").font(.headline).foregroundColor(.oldGloryRed)
             HStack {
                 Text("Yes: \(bill.yesVotes)")
                 Spacer()
@@ -626,7 +626,7 @@ struct BillDetailPage: View {
     private var citizensBriefingSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Text("Citizens Briefing").font(.headline).fontWeight(.bold)
+                Text("Citizens Briefing").font(.headline).fontWeight(.bold).foregroundColor(.oldGloryRed)
                 Spacer()
                 Button("See Full text") {
                     // TODO - Add this functionality
@@ -645,6 +645,7 @@ struct BillDetailPage: View {
                 Text("Comments")
                     .font(.headline)
                     .fontWeight(.bold)
+                    .foregroundColor(.oldGloryRed)
                 Spacer()
                 Button("Add Comment") { showingAddComment = true }
             }
@@ -782,7 +783,9 @@ struct LegislatorDetailPage: View {
         var body: some View {
             VStack(alignment: .leading, spacing: 8) {
                 Text("Attendance Score: \(String(format: "%.0f", attendanceScore))%").font(.headline)
+                    .foregroundColor(.oldGloryRed)
                 Text("Alignment Score: \(String(format: "%.0f", alignmentScore))%").font(.headline)
+                    .foregroundColor(.oldGloryRed)
             }
         }
     }
