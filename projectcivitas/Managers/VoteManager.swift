@@ -23,14 +23,8 @@ class VotingManager: ObservableObject {
         }
     }
     
-    func vote(for bill: Bill, vote: Vote) {
-        Task {
-            await updateVote(for: bill, vote: vote)
-        }
-    }
-    
     @MainActor
-    private func updateVote(for bill: Bill, vote: Vote) async {
+    func vote(for bill: Bill, vote: Vote) {
         guard let index = bills.firstIndex(where: { $0.id == bill.id }) else { return }
         
         var updatedBill = bills[index]
@@ -54,15 +48,16 @@ class VotingManager: ObservableObject {
         bills[index] = updatedBill
         userVotingRecord.recordVote(billId: bill.id, vote: vote)
         
-        do {
-            try await dataSource.updateBill(updatedBill)
-        } catch {
-            print("Error updating bill: \(error)")
-            // You might want to implement some error handling or rollback logic here
+        Task {
+            do {
+                try await dataSource.updateBill(updatedBill)
+            } catch {
+                print("Error updating bill: \(error)")
+                // Implement error handling or rollback logic here
+            }
         }
     }
 }
-
 class UserVotingRecord: ObservableObject {
     @Published var votes: [UUID: Vote] = [:]
     
