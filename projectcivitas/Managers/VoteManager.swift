@@ -4,6 +4,11 @@
 
 import Foundation
 
+enum VotingError: Error {
+    case billNotFound
+    case updateFailed(Error)
+}
+
 class VotingManager: ObservableObject {
     @Published private(set) var bills: [Bill] = []
     private let dataSource: DataAccessLayer
@@ -28,8 +33,8 @@ class VotingManager: ObservableObject {
     }
     
     @MainActor
-    func vote(for bill: Bill, vote: Vote) {
-        guard let index = bills.firstIndex(where: { $0.id == bill.id }) else { return }
+    func vote(for bill: Bill, vote: Vote) async throws {
+        guard let index = bills.firstIndex(where: { $0.id == bill.id }) else { throw VotingError.billNotFound }
         
         var updatedBill = bills[index]
         
@@ -56,12 +61,12 @@ class VotingManager: ObservableObject {
             do {
                 try await dataSource.updateBill(updatedBill)
             } catch {
-                print("Error updating bill: \(error)")
-                // Implement error handling or rollback logic here
+                throw VotingError.updateFailed(error)
             }
         }
     }
 }
+
 class UserVotingRecord: ObservableObject {
     @Published var votes: [UUID: Vote] = [:]
     

@@ -528,12 +528,13 @@ struct BillRow: View {
 
 struct BillDetailPage: View {
     @EnvironmentObject var votingManager: VotingManager
+    
     @State var bill: Bill
     @State private var showingAddComment = false
-    
     @State private var showingCelebration = false
     @State private var celebratedVote: Vote?
     @State private var voteButtonScale: CGFloat = 1.0
+    @State private var errorMessage: String?
     
     var body: some View {
         ZStack {
@@ -603,32 +604,36 @@ struct BillDetailPage: View {
     }
     
     private var votingSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: 8) {
             HStack {
-                VoteButton(title: "Vote Yes", color: .fruitSaladGreen, action: { vote(.yes) }, isSelected: bill.userVote == .yes)
+                VoteButton(title: "Vote Yes", color: .fruitSaladGreen, action: { Task { await vote(.yes) } }, isSelected: bill.userVote == .yes)
                     .scaleEffect(bill.userVote == .yes ? voteButtonScale : 1.0)
-                VoteButton(title: "Vote No", color: .oldGloryRed, action: { vote(.no) }, isSelected: bill.userVote == .no)
+                VoteButton(title: "Vote No", color: .oldGloryRed, action: { Task { await vote(.no) } }, isSelected: bill.userVote == .no)
                     .scaleEffect(bill.userVote == .no ? voteButtonScale : 1.0)
             }
         }
     }
     
-    private func vote(_ vote: Vote) {
-        votingManager.vote(for: bill, vote: vote)
-        updateBillState()
-        
-        withAnimation(.spring(response: 0.3, dampingFraction: 0.6, blendDuration: 0)) {
-            voteButtonScale = 1.2
-        }
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+    private func vote(_ vote: Vote) async {
+        do {
+            try await votingManager.vote(for: bill, vote: vote)
+            updateBillState()
+            
             withAnimation(.spring(response: 0.3, dampingFraction: 0.6, blendDuration: 0)) {
-                voteButtonScale = 1.0
+                voteButtonScale = 1.2
             }
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.6, blendDuration: 0)) {
+                    voteButtonScale = 1.0
+                }
+            }
+            
+            celebratedVote = vote
+            showingCelebration = true
+        } catch {
+            errorMessage = error.localizedDescription
         }
-        
-        celebratedVote = vote
-        showingCelebration = true
     }
     
     private var citizensBriefingSection: some View {
