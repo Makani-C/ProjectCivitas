@@ -6,6 +6,7 @@ import Foundation
 import Combine
 
 struct Filters {
+    var followed: Bool = false
     var tags: Set<String> = []
     var sessions: Set<String> = []
     var bodies: Set<String> = []

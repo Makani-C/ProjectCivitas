@@ -252,6 +252,7 @@ struct AssociatedItemCard: View {
 // MARK: - Catalog
 
 struct CatalogPage: View {
+    @EnvironmentObject var settingsManager: SettingsManager
     @EnvironmentObject var votingManager: VotingManager
     @State private var selectedTab: CatalogTab = .bills
     @StateObject private var billFilterManager = FilterManager<Bill>(
@@ -370,6 +371,7 @@ struct CatalogPage: View {
                 case "tags": return !Set(bill.tags).isDisjoint(with: values)
                 case "sessions": return values.contains(bill.session)
                 case "bodies": return values.contains(bill.body)
+                case "followed": return values.contains("true") ? settingsManager.isFollowing(bill) : true
                 default: return true
                 }
             }
@@ -385,6 +387,7 @@ struct CatalogPage: View {
                 case "parties": return values.contains(legislator.party)
                 case "states": return values.contains(legislator.state)
                 case "chambers": return values.contains(legislator.chamber)
+                case "followed": return values.contains("true") ? settingsManager.isFollowing(legislator) : true
                 default: return true
                 }
             }
@@ -482,7 +485,8 @@ struct BillFilteredList: View {
         [
             FilterCategory(name: "Tags", key: "tags", values: Array(Set(sampleBills.flatMap { $0.tags }))),
             FilterCategory(name: "Sessions", key: "sessions", values: Array(Set(sampleBills.map { $0.session }))),
-            FilterCategory(name: "Bodies", key: "bodies", values: Array(Set(sampleBills.map { $0.body })))
+            FilterCategory(name: "Bodies", key: "bodies", values: Array(Set(sampleBills.map { $0.body }))),
+            FilterCategory(name: "Followed Only", key: "followed", values: ["true", "false"])
         ]
     }
     
@@ -697,7 +701,8 @@ struct LegislatorFilteredList: View {
         [
             FilterCategory(name: "Parties", key: "parties", values: Array(Set(sampleLegislators.map { $0.party }))),
             FilterCategory(name: "States", key: "states", values: Array(Set(sampleLegislators.map { $0.state }))),
-            FilterCategory(name: "Chambers", key: "chambers", values: Array(Set(sampleLegislators.map { $0.chamber })))
+            FilterCategory(name: "Chambers", key: "chambers", values: Array(Set(sampleLegislators.map { $0.chamber }))),
+            FilterCategory(name: "Followed Only", key: "followed", values: ["true", "false"])
         ]
     }
     
