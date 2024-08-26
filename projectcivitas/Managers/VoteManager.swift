@@ -1,6 +1,3 @@
-//
-//  VoteManager.swift
-
 import Foundation
 
 class VotingManager: ObservableObject {

@@ -1,17 +1,17 @@
 //
 //  Models.swift
+//  projectcivitas
+//
+//  Created by Makani Cartwright on 8/22/24.
+//
 
 import Foundation
-
-protocol Followable: Identifiable {
-    var id: UUID { get }
-}
 
 enum Vote: String {
     case yes, no, abstain, notPresent
 }
 
-struct Bill: Identifiable, Followable {
+struct Bill: Identifiable {
     let id: UUID
     let title: String
     let description: String
@@ -31,7 +31,7 @@ struct Bill: Identifiable, Followable {
     }
 }
 
-struct Legislator: Identifiable, Followable {
+struct Legislator: Identifiable {
     let id = UUID()
     let name: String
     let party: String
@@ -45,25 +45,24 @@ struct Legislator: Identifiable, Followable {
     let votingRecord: [VotingRecord]
     let fundingRecord: [FundingRecord]
     
-    func alignmentScore(with userVotes: [UUID: Vote]) -> Double? {
-        let totalVotes = votingRecord.count
-        guard totalVotes > 0 else { return nil }
-        
+    func alignmentScore(with userVotes: [UUID: Vote]) -> Double {
         let matchingVotes = votingRecord.filter { record in
             guard let userVote = userVotes[record.billId] else {
                 return false
             }
             return record.vote == userVote
         }
-        return Double(matchingVotes.count) / Double(totalVotes) * 100
+        return Double(matchingVotes.count) / Double(votingRecord.count) * 100
     }
     
-    func attendanceScore() -> Double? {
-        let totalVotes = votingRecord.count
-        guard totalVotes > 0 else { return nil }
-        
-        let attendedVotes = votingRecord.filter { $0.vote != .notPresent }.count
-        return Double(attendedVotes) / Double(totalVotes) * 100
+    func attendanceScore() -> Double {
+        var attendedVotes = 0
+        for record in votingRecord {
+            if record.vote != .notPresent {
+                attendedVotes += 1
+            }
+        }
+        return Double(attendedVotes) / Double(votingRecord.count) * 100
     }
 }
 

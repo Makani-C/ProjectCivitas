@@ -1,21 +1,19 @@
-//
-//  SettingsManager.swift
-
 import Foundation
 
 struct UserProfile {
-    var followedItems: Set<UUID> = []
+    var location: String
+    var followedLegislators: Set<UUID>
     
-    mutating func toggleFollow(_ item: any Followable) {
-        if followedItems.contains(item.id) {
-            followedItems.remove(item.id)
+    mutating func toggleFollowLegislator(_ legislatorId: UUID) {
+        if followedLegislators.contains(legislatorId) {
+            followedLegislators.remove(legislatorId)
         } else {
-            followedItems.insert(item.id)
+            followedLegislators.insert(legislatorId)
         }
     }
     
-    func isFollowing(_ item: any Followable) -> Bool {
-        followedItems.contains(item.id)
+    func isFollowing(_ legislatorId: UUID) -> Bool {
+        followedLegislators.contains(legislatorId)
     }
 }
 
@@ -41,7 +39,6 @@ class SettingsManager: ObservableObject {
     @Published var userProfile: UserProfile {
         didSet {
             saveUserProfile()
-            objectWillChange.send()
         }
     }
     
@@ -53,33 +50,26 @@ class SettingsManager: ObservableObject {
     }
     
     private func saveUserProfile() {
-        let followedItemsArray = Array(userProfile.followedItems)
-        UserDefaults.standard.set(followedItemsArray.map { $0.uuidString }, forKey: "followedItems")
+        UserDefaults.standard.set(userProfile.location, forKey: "userLocation")
+        UserDefaults.standard.set(userProfile.followedLegislators.map { $0.uuidString }, forKey: "followedLegislators")
     }
     
     private static func loadUserProfile() -> UserProfile {
-        let followedItemStrings = UserDefaults.standard.stringArray(forKey: "followedItems") ?? []
-        let followedItems = Set(followedItemStrings.compactMap { UUID(uuidString: $0) })
-        var profile = UserProfile()
-        profile.followedItems = followedItems
-        return profile
+        let location = UserDefaults.standard.string(forKey: "userLocation") ?? ""
+        let followedLegislatorStrings = UserDefaults.standard.stringArray(forKey: "followedLegislators") ?? []
+        let followedLegislators = Set(followedLegislatorStrings.compactMap { UUID(uuidString: $0) })
+        return UserProfile(location: location, followedLegislators: followedLegislators)
     }
     
-    func toggleFollow(_ item: any Followable) {
-        if userProfile.isFollowing(item) {
-            print("SettingsManager: Unfollowing item with ID: \(item.id)")
-            userProfile.followedItems.remove(item.id)
-        } else {
-            print("SettingsManager: Following item with ID: \(item.id)")
-            userProfile.followedItems.insert(item.id)
-        }
-        objectWillChange.send()
-        print("SettingsManager: Current followed items: \(userProfile.followedItems)")
+    func updateLocation(_ newLocation: String) {
+        userProfile.location = newLocation
     }
-
-    func isFollowing(_ item: any Followable) -> Bool {
-        let isFollowing = userProfile.followedItems.contains(item.id)
-        print("SettingsManager: Checking if following item with ID: \(item.id), result: \(isFollowing)")
-        return isFollowing
+    
+    func toggleFollowLegislator(_ legislatorId: UUID) {
+        userProfile.toggleFollowLegislator(legislatorId)
+    }
+    
+    func isFollowingLegislator(_ legislatorId: UUID) -> Bool {
+        userProfile.isFollowing(legislatorId)
     }
 }
