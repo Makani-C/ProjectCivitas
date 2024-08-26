@@ -191,19 +191,19 @@ struct AssociatedItemsCarousel: View {
                     }
                     .padding(.trailing, 40) // Add extra padding to show partial next card
                 }
-                #if compiler(>=5.9)
+#if compiler(>=5.9)
                 .onChange(of: currentIndex) { oldIndex, newIndex in
                     withAnimation {
                         proxy.scrollTo(newIndex, anchor: .leading)
                     }
                 }
-                #else
+#else
                 .onChange(of: currentIndex) { newIndex in
                     withAnimation {
                         proxy.scrollTo(newIndex, anchor: .leading)
                     }
                 }
-                #endif
+#endif
             }
         }
         .background(
@@ -252,41 +252,48 @@ struct AssociatedItemCard: View {
 
 struct CatalogPage: View {
     @EnvironmentObject var votingManager: VotingManager
-    @State private var selectedTab: CatalogTab = .bills
-    @StateObject private var billFilterManager = FilterManager<Bill>(
-        initialSortOption: "Updated",
-        sortKeyPath: { sortOption in
-            switch sortOption {
-            case "Updated":
-                return { $0.lastUpdated > $1.lastUpdated }
-            case "Title":
-                return { $0.title < $1.title }
-            case "Popularity":
-                return { $0.yesVotes + $0.noVotes > $1.yesVotes + $1.noVotes }
-            default:
-                return { $0.lastUpdated > $1.lastUpdated }
-            }
-        }
-    )
-    @StateObject private var legislatorFilterManager = FilterManager<Legislator>(
-        initialSortOption: "Name",
-        sortKeyPath: { sortOption in
-            switch sortOption {
-            case "Name":
-                return { $0.name < $1.name }
-            case "State":
-                return { $0.state < $1.state }
-            case "Party":
-                return { $0.party < $1.party }
-            default:
-                return { $0.name < $1.name }
-            }
-        }
-    )
+    @EnvironmentObject var settingsManager: SettingsManager
     
-    enum CatalogTab {
-        case bills
-        case legislators
+    @State private var selectedTab: CatalogTab = .bills
+    
+    @StateObject private var billFilterManager: FilterManager<Bill>
+    @StateObject private var legislatorFilterManager: FilterManager<Legislator>
+    
+    init() {
+        let settingsManager = SettingsManager()
+        
+        self._billFilterManager = StateObject(wrappedValue: FilterManager<Bill>(
+            initialSortOption: "Updated",
+            sortKeyPath: { sortOption in
+                switch sortOption {
+                case "Updated":
+                    return { $0.lastUpdated > $1.lastUpdated }
+                case "Title":
+                    return { $0.title < $1.title }
+                case "Popularity":
+                    return { $0.yesVotes + $0.noVotes > $1.yesVotes + $1.noVotes }
+                default:
+                    return { $0.lastUpdated > $1.lastUpdated }
+                }
+            },
+            settingsManager: settingsManager
+        ))
+        self._legislatorFilterManager = StateObject(wrappedValue: FilterManager<Legislator>(
+            initialSortOption: "Name",
+            sortKeyPath: { sortOption in
+                switch sortOption {
+                case "Name":
+                    return { $0.name < $1.name }
+                case "State":
+                    return { $0.state < $1.state }
+                case "Party":
+                    return { $0.party < $1.party }
+                default:
+                    return { $0.name < $1.name }
+                }
+            },
+            settingsManager: settingsManager
+        ))
     }
     
     var body: some View {
@@ -297,8 +304,39 @@ struct CatalogPage: View {
                 catalogList
             }
             .navigationBarHidden(true)
+            .onAppear {
+                billFilterManager.setItems(votingManager.bills)
+                legislatorFilterManager.setItems(sampleLegislators)
+            }
         }
         .navigationViewStyle(StackNavigationViewStyle())
+    }
+    
+    private var catalogList: some View {
+        ScrollView {
+            LazyVStack(alignment: .leading, spacing: 0) {
+                if selectedTab == .bills {
+                    ForEach(billFilterManager.filteredItems, id: \.id) { bill in
+                        BillRow(bill: bill)
+                        Divider()
+                    }
+                } else {
+                    ForEach(legislatorFilterManager.filteredItems, id: \.id) { legislator in
+                        NavigationLink(destination: LegislatorDetailPage(legislator: legislator)) {
+                            LegislatorRow(legislator: legislator)
+                        }
+                        .buttonStyle(CustomNavigationLinkStyle())
+                        Divider()
+                    }
+                }
+            }
+        }
+    }
+    
+    
+    enum CatalogTab {
+        case bills
+        case legislators
     }
     
     private var searchAndFilterHeader: some View {
@@ -336,27 +374,6 @@ struct CatalogPage: View {
         func makeBody(configuration: Configuration) -> some View {
             configuration.label
                 .foregroundColor(.primary) // Use primary color instead of blue
-        }
-    }
-    
-    private var catalogList: some View {
-        ScrollView {
-            LazyVStack(alignment: .leading, spacing: 0) {
-                if selectedTab == .bills {
-                    ForEach(filteredBills, id: \.id) { bill in
-                        BillRow(bill: bill)
-                        Divider()
-                    }
-                } else {
-                    ForEach(filteredLegislators, id: \.id) { legislator in
-                        NavigationLink(destination: LegislatorDetailPage(legislator: legislator)) {
-                            LegislatorRow(legislator: legislator)
-                        }
-                        .buttonStyle(CustomNavigationLinkStyle())
-                        Divider()
-                    }
-                }
-            }
         }
     }
     
@@ -491,6 +508,7 @@ struct BillFilteredList: View {
 
 struct BillRow: View {
     let bill: Bill
+    @EnvironmentObject var settingsManager: SettingsManager
     
     var body: some View {
         NavigationLink(destination: BillDetailPage(bill: bill)) {
@@ -509,6 +527,10 @@ struct BillRow: View {
                         .foregroundColor(.primary)
                         .lineLimit(2)
                         .fixedSize(horizontal: false, vertical: true)
+                    if settingsManager.isFollowing(bill) {
+                        Image(systemName: "star.fill")
+                            .foregroundColor(.oldGloryBlue)
+                    }
                 }
                 
                 Text(bill.description)
@@ -528,6 +550,7 @@ struct BillRow: View {
 
 struct BillDetailPage: View {
     @EnvironmentObject var votingManager: VotingManager
+    @EnvironmentObject var settingsManager: SettingsManager
     @State var bill: Bill
     @State private var showingAddComment = false
     
@@ -561,6 +584,23 @@ struct BillDetailPage: View {
             if showingCelebration, let vote = celebratedVote {
                 CelebrateVoteView(vote: vote, isPresented: $showingCelebration)
             }
+        }
+    }
+    
+    private var followButton: some View {
+        Button(action: {
+            settingsManager.toggleFollow(bill)
+        }) {
+            Text(settingsManager.isFollowing(bill) ? "Following" : "Follow")
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
+                .background(settingsManager.userProfile.isFollowing(bill) ? Color.white : Color.oldGloryBlue)
+                .foregroundColor(settingsManager.userProfile.isFollowing(bill) ? .oldGloryBlue : .white)
+                .cornerRadius(20)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 20)
+                        .stroke(Color.white, lineWidth: 1)
+                )
         }
     }
     
@@ -697,6 +737,7 @@ struct LegislatorFilteredList: View {
 
 struct LegislatorRow: View {
     let legislator: Legislator
+    @EnvironmentObject var settingsManager: SettingsManager
     
     var body: some View {
         HStack {
@@ -714,6 +755,10 @@ struct LegislatorRow: View {
                 Text(legislator.chamber).font(.caption)
             }
             Spacer()
+            if settingsManager.userProfile.isFollowing(legislator) {
+                Image(systemName: "star.fill")
+                    .foregroundColor(.oldGloryBlue)
+            }
             Image(systemName: "chevron.right")
         }
         .padding()
@@ -732,7 +777,6 @@ struct LegislatorDetailPage: View {
             legislatorHeader
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
-                    followButton
                     ScoreSection(attendanceScore: legislator.attendanceScore(),
                                  alignmentScore: legislator.alignmentScore(with: userVotingRecord.votes))
                     InfoSection("Top Issues") {
@@ -753,18 +797,29 @@ struct LegislatorDetailPage: View {
     
     private var followButton: some View {
         Button(action: {
-            settingsManager.userProfile.toggleFollowLegislator(legislator.id)
+            settingsManager.toggleFollow(legislator)
         }) {
-            Text(settingsManager.userProfile.isFollowing(legislator.id) ? "Unfollow" : "Follow")
-                .padding()
-                .background(Color.oldGloryBlue)
-                .foregroundColor(.white)
-                .cornerRadius(8)
+            Text(settingsManager.isFollowing(legislator) ? "Following" : "Follow")
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
+                .background(settingsManager.userProfile.isFollowing(legislator) ? Color.white : Color.oldGloryBlue)
+                .foregroundColor(settingsManager.userProfile.isFollowing(legislator) ? .oldGloryBlue : .white)
+                .cornerRadius(20)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 20)
+                        .stroke(Color.white, lineWidth: 1)
+                )
         }
     }
     
     private var legislatorHeader: some View {
         HeaderView {
+            HStack {
+                Spacer()
+                followButton
+            }
+            .padding(.bottom, 8)
+            
             AsyncImage(url: URL(string: legislator.imageUrl)) { $0.resizable() } placeholder: { Color.gray }
                 .frame(width: 100, height: 100)
                 .clipShape(Circle())
@@ -785,15 +840,25 @@ struct LegislatorDetailPage: View {
     }
     
     struct ScoreSection: View {
-        let attendanceScore: Double
-        let alignmentScore: Double
+        let attendanceScore: Double?
+        let alignmentScore: Double?
         
         var body: some View {
             VStack(alignment: .leading, spacing: 8) {
-                Text("Attendance Score: \(String(format: "%.0f", attendanceScore))%").font(.headline)
+                Text("Attendance Score: \(scoreText(attendanceScore))")
+                    .font(.headline)
                     .foregroundColor(.oldGloryRed)
-                Text("Alignment Score: \(String(format: "%.0f", alignmentScore))%").font(.headline)
+                Text("Alignment Score: \(scoreText(alignmentScore))")
+                    .font(.headline)
                     .foregroundColor(.oldGloryRed)
+            }
+        }
+        
+        private func scoreText(_ score: Double?) -> String {
+            if let score = score {
+                return String(format: "%.0f%%", score)
+            } else {
+                return "N/A"
             }
         }
     }
@@ -1212,8 +1277,9 @@ struct UserSettingsView: View {
 
 // MARK: - General
 
-struct FilteredList<T>: View {
+struct FilteredList<T: Followable>: View {
     @ObservedObject var filterManager: FilterManager<T>
+    @EnvironmentObject var settingsManager: SettingsManager
     let sortOptions: [String]
     let filterCategories: [FilterCategory<T>]
     
@@ -1224,6 +1290,14 @@ struct FilteredList<T>: View {
                 Spacer()
                 sortMenu
             }
+            
+            Toggle("Show only followed", isOn: $filterManager.showOnlyFollowed)
+                .foregroundColor(.white)
+                .bold()
+                .toggleStyle(SwitchToggleStyle(tint: .oldGloryRed))
+                .onChange(of: filterManager.showOnlyFollowed) { _ in
+                    filterManager.objectWillChange.send()
+                }
             
             if !filterManager.isEmpty {
                 ScrollView(.horizontal, showsIndicators: false) {
@@ -1239,7 +1313,6 @@ struct FilteredList<T>: View {
                 }
             }
         }
-        .padding(.vertical, 8)
     }
     
     private var filterMenu: some View {
