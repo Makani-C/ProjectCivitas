@@ -699,6 +699,8 @@ struct BillDetailPage: View {
                         Divider()
                         citizensBriefingSection
                         Divider()
+                        votingRecordSection
+                        Divider()
                         commentSection
                     }
                     .padding()
@@ -805,6 +807,51 @@ struct BillDetailPage: View {
         }
     }
     
+    private var votingRecordSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Legislator Voting Record")
+                .font(.headline)
+                .foregroundColor(.oldGloryRed)
+
+            let votingRecords = bill.getVotingRecord(allVotingRecords: sampleVotingRecords)
+            let legislators = sampleLegislators
+            if votingRecords.isEmpty {
+                Text("No voting records available for this bill.")
+                    .foregroundColor(.secondary)
+            } else {
+                VStack(spacing: 0) {
+                    TableHeader(headers: ["Legislator", "Vote", "Date"])
+
+                    ForEach(votingRecords) { record in
+                        TableRow {
+                            if let legislator = legislators.first(where: { $0.id == record.legislatorId }) {
+                                Text(legislator.name)
+                                    .font(.subheadline)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                            } else {
+                                Text("Unknown Legislator")
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                            }
+                            Text(record.vote.rawValue.capitalized)
+                                .font(.subheadline)
+                                .frame(maxWidth: .infinity, alignment: .center)
+                            Text(record.date, style: .date)
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                                .frame(maxWidth: .infinity, alignment: .trailing)
+                        }
+                        Divider()
+                    }
+                }
+                .background(Color.white)
+                .cornerRadius(8)
+                .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
+            }
+        }
+    }
+    
     private var commentSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
@@ -890,19 +937,23 @@ struct LegislatorDetailPage: View {
     @EnvironmentObject var userVotingRecord: UserVotingRecord
     @EnvironmentObject var settingsManager: SettingsManager
     
+    var votingRecords = sampleVotingRecords;
+    
     var body: some View {
         VStack(spacing: 0) {
             legislatorHeader
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
-                    ScoreSection(attendanceScore: legislator.attendanceScore(),
-                                 alignmentScore: legislator.alignmentScore(with: userVotingRecord.votes))
+                    ScoreSection(
+                        attendanceScore: legislator.attendanceScore(votingRecords: votingRecords),
+                        alignmentScore: legislator.alignmentScore(with: userVotingRecord.votes, votingRecords: votingRecords)
+                    )
                     InfoSection("Top Issues") {
                         ForEach(legislator.topIssues, id: \.self) { Text("• \($0)") }
                     }
                     ContactInfoSection(contactInfo: legislator.contactInfo)
                     SocialMediaSection(socialMedia: legislator.socialMedia)
-                    VotingRecordSection(votingRecord: legislator.votingRecord, votingManager: votingManager)
+                    VotingRecordSection(votingRecord: legislator.getVotingRecord(allVotingRecords: votingRecords), votingManager: votingManager)
                     FundingRecordSection(fundingRecord: legislator.fundingRecord)
                 }
                 .padding()

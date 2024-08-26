@@ -30,10 +30,14 @@ struct Bill: Identifiable, Followable {
     var totalCommentCount: Int {
         comments.reduce(0) { $0 + $1.totalReplyCount + 1 }
     }
+    
+    func getVotingRecord(allVotingRecords: [VotingRecord]) -> [VotingRecord] {
+        return allVotingRecords.filter { $0.billId == self.id }
+    }
 }
 
 struct Legislator: Identifiable, Followable {
-    let id = UUID()
+    let id: UUID
     let name: String
     let party: String
     let state: String
@@ -43,26 +47,39 @@ struct Legislator: Identifiable, Followable {
     let topIssues: [String]
     let contactInfo: ContactInfo
     let socialMedia: SocialMedia
-    let votingRecord: [VotingRecord]
     let fundingRecord: [FundingRecord]
     
-    func alignmentScore(with userVotes: [UUID: Vote]) -> Double? {
-        let totalVotes = votingRecord.count
-        guard totalVotes > 0 else { return nil }
-        let matchingVotes = votingRecord.filter { record in
-            guard let userVote = userVotes[record.billId] else {
-                return false
-            }
-            return record.vote == userVote
-        }
-        return Double(matchingVotes.count) / Double(totalVotes) * 100
+    func getVotingRecord(allVotingRecords: [VotingRecord]) -> [VotingRecord] {
+        return allVotingRecords.filter { $0.legislatorId == self.id }
     }
     
-    func attendanceScore() -> Double? {
-        let totalVotes = votingRecord.count
-        guard totalVotes > 0 else { return nil }
+    func alignmentScore(with userVotes: [UUID: Vote], votingRecords: [VotingRecord]) -> Double? {
+        var totalVotes = 0
+        var matchingVotes = 0
         
-        let attendedVotes = votingRecord.filter { $0.vote != .notPresent }.count
+        for record in votingRecords where record.legislatorId == self.id {
+            totalVotes += 1
+            if let userVote = userVotes[record.billId], record.vote == userVote {
+                matchingVotes += 1
+            }
+        }
+        
+        guard totalVotes > 0 else { return nil }
+        return Double(matchingVotes) / Double(totalVotes) * 100
+    }
+    
+    func attendanceScore(votingRecords: [VotingRecord]) -> Double? {
+        var totalVotes = 0
+        var attendedVotes = 0
+        
+        for record in votingRecords where record.legislatorId == self.id {
+            totalVotes += 1
+            if record.vote != .notPresent {
+                attendedVotes += 1
+            }
+        }
+        
+        guard totalVotes > 0 else { return nil }
         return Double(attendedVotes) / Double(totalVotes) * 100
     }
 }
@@ -80,8 +97,9 @@ struct SocialMedia {
 }
 
 struct VotingRecord: Identifiable {
-    let id = UUID()
+    let id: UUID
     let billId: UUID
+    let legislatorId: UUID
     let vote: Vote
     let date: Date
 }

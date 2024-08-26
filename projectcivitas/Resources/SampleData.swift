@@ -174,6 +174,7 @@ let sampleBills = [
 
 let sampleLegislators = [
     Legislator(
+        id: UUID(),
         name: "John Smith",
         party: "Democrat",
         state: "WA",
@@ -191,12 +192,6 @@ let sampleLegislators = [
             facebook: "RepJohnSmith",
             instagram: "repjohnsmith"
         ),
-        votingRecord: [
-            VotingRecord(billId: sampleBills[0].id, vote: .yes, date: Date()),
-            VotingRecord(billId: sampleBills[1].id, vote: .no, date: Date().addingTimeInterval(-86400)),
-            VotingRecord(billId: sampleBills[2].id, vote: .yes, date: Date().addingTimeInterval(-172800)),
-            VotingRecord(billId: sampleBills[3].id, vote: .notPresent, date: Date().addingTimeInterval(-172800)),
-        ],
         fundingRecord: [
             FundingRecord(source: "Individual Contributions", amount: 500000, date: Date()),
             FundingRecord(source: "PAC Contributions", amount: 250000, date: Date().addingTimeInterval(-86400)),
@@ -204,6 +199,7 @@ let sampleLegislators = [
         ]
     ),
     Legislator(
+        id: UUID(),
         name: "Jane Doe",
         party: "Democrat",
         state: "WA",
@@ -221,12 +217,6 @@ let sampleLegislators = [
             facebook: "repJaneDoe",
             instagram: "repJaneDoe"
         ),
-        votingRecord: [
-            VotingRecord(billId: sampleBills[0].id, vote: .yes, date: Date()),
-            VotingRecord(billId: sampleBills[1].id, vote: .no, date: Date().addingTimeInterval(-86400)),
-            VotingRecord(billId: sampleBills[2].id, vote: .yes, date: Date().addingTimeInterval(-172800)),
-            VotingRecord(billId: sampleBills[3].id, vote: .notPresent, date: Date().addingTimeInterval(-172800)),
-        ],
         fundingRecord: [
             FundingRecord(source: "Individual Contributions", amount: 500000, date: Date()),
             FundingRecord(source: "PAC Contributions", amount: 250000, date: Date().addingTimeInterval(-86400)),
@@ -234,6 +224,7 @@ let sampleLegislators = [
         ]
     ),
     Legislator(
+        id: UUID(),
         name: "Peter Abbarno",
         party: "Republican",
         state: "WA",
@@ -251,12 +242,6 @@ let sampleLegislators = [
             facebook: "reppabb",
             instagram: "reppabb"
         ),
-        votingRecord: [
-            VotingRecord(billId: sampleBills[0].id, vote: .yes, date: Date()),
-            VotingRecord(billId: sampleBills[1].id, vote: .no, date: Date().addingTimeInterval(-86400)),
-            VotingRecord(billId: sampleBills[2].id, vote: .yes, date: Date().addingTimeInterval(-172800)),
-            VotingRecord(billId: sampleBills[3].id, vote: .notPresent, date: Date().addingTimeInterval(-172800)),
-        ],
         fundingRecord: [
             FundingRecord(source: "Individual Contributions", amount: 500000, date: Date()),
             FundingRecord(source: "PAC Contributions", amount: 250000, date: Date().addingTimeInterval(-86400)),
@@ -264,6 +249,7 @@ let sampleLegislators = [
         ]
     ),
     Legislator(
+        id: UUID(),
         name: "Dan Newhouse",
         party: "Republican",
         state: "US",
@@ -281,10 +267,10 @@ let sampleLegislators = [
             facebook: "repNewhouse",
             instagram: "repNewhouse"
         ),
-        votingRecord: [],
         fundingRecord: []
     ),
     Legislator(
+        id: UUID(),
         name: "Marie Glusenkamp-Perez",
         party: "Democrat",
         state: "US",
@@ -302,10 +288,10 @@ let sampleLegislators = [
             facebook: "repmarieGP",
             instagram: "@repMarieGP"
         ),
-        votingRecord: [],
         fundingRecord: []
     ),
     Legislator(
+        id: UUID(),
         name: "Maria Cantwell",
         party: "Democrat",
         state: "US",
@@ -323,10 +309,10 @@ let sampleLegislators = [
             facebook: "senatorCantwell",
             instagram: "@senatorCantwell"
         ),
-        votingRecord: [],
         fundingRecord: []
     ),
     Legislator(
+        id: UUID(),
         name: "Patty Murray",
         party: "Democrat",
         state: "US",
@@ -344,7 +330,43 @@ let sampleLegislators = [
             facebook: "senatorPMurray",
             instagram: "@senatorMurray"
         ),
-        votingRecord: [],
         fundingRecord: []
     ),
+]
+
+let sampleVotingRecords: [VotingRecord] = [
+    VotingRecord(id: UUID(), billId: sampleBills[0].id, legislatorId: sampleLegislators[0].id, vote: .yes, date: Date()),
+    VotingRecord(id: UUID(), billId: sampleBills[1].id, legislatorId: sampleLegislators[0].id, vote: .no, date: Date().addingTimeInterval(-86400)),
+    VotingRecord(id: UUID(), billId: sampleBills[2].id, legislatorId: sampleLegislators[0].id, vote: .yes, date: Date().addingTimeInterval(-172800)),
+    VotingRecord(id: UUID(), billId: sampleBills[3].id, legislatorId: sampleLegislators[0].id, vote: .notPresent, date: Date().addingTimeInterval(-172800)),
+    
+    VotingRecord(id: UUID(), billId: sampleBills[0].id, legislatorId: sampleLegislators[1].id, vote: .yes, date: Date()),
+    VotingRecord(id: UUID(), billId: sampleBills[1].id, legislatorId: sampleLegislators[1].id, vote: .no, date: Date().addingTimeInterval(-86400)),
+    VotingRecord(id: UUID(), billId: sampleBills[2].id, legislatorId: sampleLegislators[1].id, vote: .yes, date: Date().addingTimeInterval(-172800)),
+    VotingRecord(id: UUID(), billId: sampleBills[3].id, legislatorId: sampleLegislators[1].id, vote: .notPresent, date: Date().addingTimeInterval(-172800)),
+    
+    VotingRecord(id: UUID(), billId: sampleBills[0].id, legislatorId: sampleLegislators[2].id, vote: .yes, date: Date()),
+    VotingRecord(id: UUID(), billId: sampleBills[1].id, legislatorId: sampleLegislators[2].id, vote: .no, date: Date().addingTimeInterval(-86400)),
+    VotingRecord(id: UUID(), billId: sampleBills[2].id, legislatorId: sampleLegislators[2].id, vote: .yes, date: Date().addingTimeInterval(-172800)),
+    VotingRecord(id: UUID(), billId: sampleBills[3].id, legislatorId: sampleLegislators[2].id, vote: .notPresent, date: Date().addingTimeInterval(-172800)),
+    
+    VotingRecord(id: UUID(), billId: sampleBills[0].id, legislatorId: sampleLegislators[3].id, vote: .yes, date: Date()),
+    VotingRecord(id: UUID(), billId: sampleBills[1].id, legislatorId: sampleLegislators[3].id, vote: .no, date: Date().addingTimeInterval(-86400)),
+    VotingRecord(id: UUID(), billId: sampleBills[2].id, legislatorId: sampleLegislators[3].id, vote: .yes, date: Date().addingTimeInterval(-172800)),
+    VotingRecord(id: UUID(), billId: sampleBills[3].id, legislatorId: sampleLegislators[3].id, vote: .notPresent, date: Date().addingTimeInterval(-172800)),
+    
+    VotingRecord(id: UUID(), billId: sampleBills[0].id, legislatorId: sampleLegislators[4].id, vote: .yes, date: Date()),
+    VotingRecord(id: UUID(), billId: sampleBills[1].id, legislatorId: sampleLegislators[4].id, vote: .no, date: Date().addingTimeInterval(-86400)),
+    VotingRecord(id: UUID(), billId: sampleBills[2].id, legislatorId: sampleLegislators[4].id, vote: .yes, date: Date().addingTimeInterval(-172800)),
+    VotingRecord(id: UUID(), billId: sampleBills[3].id, legislatorId: sampleLegislators[4].id, vote: .notPresent, date: Date().addingTimeInterval(-172800)),
+    
+    VotingRecord(id: UUID(), billId: sampleBills[0].id, legislatorId: sampleLegislators[5].id, vote: .yes, date: Date()),
+    VotingRecord(id: UUID(), billId: sampleBills[1].id, legislatorId: sampleLegislators[5].id, vote: .no, date: Date().addingTimeInterval(-86400)),
+    VotingRecord(id: UUID(), billId: sampleBills[2].id, legislatorId: sampleLegislators[5].id, vote: .yes, date: Date().addingTimeInterval(-172800)),
+    VotingRecord(id: UUID(), billId: sampleBills[3].id, legislatorId: sampleLegislators[5].id, vote: .notPresent, date: Date().addingTimeInterval(-172800)),
+    
+    VotingRecord(id: UUID(), billId: sampleBills[0].id, legislatorId: sampleLegislators[6].id, vote: .yes, date: Date()),
+    VotingRecord(id: UUID(), billId: sampleBills[1].id, legislatorId: sampleLegislators[6].id, vote: .no, date: Date().addingTimeInterval(-86400)),
+    VotingRecord(id: UUID(), billId: sampleBills[2].id, legislatorId: sampleLegislators[6].id, vote: .yes, date: Date().addingTimeInterval(-172800)),
+    VotingRecord(id: UUID(), billId: sampleBills[3].id, legislatorId: sampleLegislators[6].id, vote: .notPresent, date: Date().addingTimeInterval(-172800)),
 ]
