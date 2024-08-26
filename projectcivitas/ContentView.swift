@@ -191,11 +191,19 @@ struct AssociatedItemsCarousel: View {
                     }
                     .padding(.trailing, 40) // Add extra padding to show partial next card
                 }
+                #if compiler(>=5.9)
+                .onChange(of: currentIndex) { oldIndex, newIndex in
+                    withAnimation {
+                        proxy.scrollTo(newIndex, anchor: .leading)
+                    }
+                }
+                #else
                 .onChange(of: currentIndex) { newIndex in
                     withAnimation {
                         proxy.scrollTo(newIndex, anchor: .leading)
                     }
                 }
+                #endif
             }
         }
         .background(
