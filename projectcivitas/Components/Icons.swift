@@ -2,7 +2,15 @@
 //  Icons.swift
 //  projectcivitas
 //
-//  Created by Makani Cartwright on 8/26/24.
-//
 
-import Foundation
+import SwiftUI
+
+struct FollowStar: View {
+    let isFollowed: Bool
+    
+    var body: some View {
+        Image(systemName: "star.fill")
+            .foregroundColor(isFollowed ? .oldGloryBlue : .clear)
+            .font(.system(size: 12))
+    }
+}

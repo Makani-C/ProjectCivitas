@@ -509,6 +509,7 @@ struct BillRow: View {
                         .foregroundColor(.primary)
                         .lineLimit(2)
                         .fixedSize(horizontal: false, vertical: true)
+                    FollowStar(isFollowed: bill.isFollowed)
                 }
                 
                 Text(bill.description)
@@ -719,6 +720,7 @@ struct LegislatorRow: View {
                 Text(legislator.chamber).font(.caption)
             }
             Spacer()
+            FollowStar(isFollowed: legislator.isFollowed)
             Image(systemName: "chevron.right")
         }
         .padding()

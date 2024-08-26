@@ -14,6 +14,7 @@
 		12727C752C79A15600FD1C91 /* DataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12727C742C79A15600FD1C91 /* DataManager.swift */; };
 		12773BC22C7CF33000C6E037 /* votingManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12773BC12C7CF33000C6E037 /* votingManagerTests.swift */; };
 		12773BC42C7D0D4F00C6E037 /* FilterManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12773BC32C7D0D4F00C6E037 /* FilterManager.swift */; };
+		12773BC62C7D0FE500C6E037 /* Icons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12773BC52C7D0FE500C6E037 /* Icons.swift */; };
 		12A72EF32C77D85A00865382 /* projectcivitasApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12A72EF22C77D85A00865382 /* projectcivitasApp.swift */; };
 		12A72EF52C77D85A00865382 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12A72EF42C77D85A00865382 /* ContentView.swift */; };
 		12A72EF72C77D85B00865382 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 12A72EF62C77D85B00865382 /* Assets.xcassets */; };
@@ -55,6 +56,7 @@
 		12727C742C79A15600FD1C91 /* DataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataManager.swift; sourceTree = "<group>"; };
 		12773BC12C7CF33000C6E037 /* votingManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = votingManagerTests.swift; sourceTree = "<group>"; };
 		12773BC32C7D0D4F00C6E037 /* FilterManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterManager.swift; sourceTree = "<group>"; };
+		12773BC52C7D0FE500C6E037 /* Icons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Icons.swift; sourceTree = "<group>"; };
 		12A72EEF2C77D85A00865382 /* projectcivitas.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = projectcivitas.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		12A72EF22C77D85A00865382 /* projectcivitasApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = projectcivitasApp.swift; sourceTree = "<group>"; };
 		12A72EF42C77D85A00865382 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -114,6 +116,7 @@
 				12727C6A2C78F8BD00FD1C91 /* Chips.swift */,
 				12D4CC132C780EAC0099D272 /* Filters.swift */,
 				12727C6F2C79002E00FD1C91 /* Comments.swift */,
+				12773BC52C7D0FE500C6E037 /* Icons.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -348,6 +351,7 @@
 				12773BC42C7D0D4F00C6E037 /* FilterManager.swift in Sources */,
 				12727C702C79002E00FD1C91 /* Comments.swift in Sources */,
 				12A72EF32C77D85A00865382 /* projectcivitasApp.swift in Sources */,
+				12773BC62C7D0FE500C6E037 /* Icons.swift in Sources */,
 				12727C6B2C78F8BD00FD1C91 /* Chips.swift in Sources */,
 				12727C692C78F88D00FD1C91 /* Buttons.swift in Sources */,
 				12D4CC0C2C780B6F0099D272 /* SampleData.swift in Sources */,

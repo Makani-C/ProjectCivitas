@@ -77,10 +77,10 @@ let sampleBills = [
         noVotes: 80,
         userVote: nil,
         comments: sampleComments,
-        lastUpdated: Date()
+        lastUpdated: Date(),
+        isFollowed: true
     ),
     Bill(
-        
         id: UUID(),
         title: "Senate Bill 5047",
         description: "Enhances the Washington Voting Rights Act",
@@ -93,7 +93,8 @@ let sampleBills = [
         noVotes: 0,
         userVote: nil,
         comments: [],
-        lastUpdated: Date()
+        lastUpdated: Date(),
+        isFollowed: true
     ),
     Bill(
         
@@ -109,7 +110,8 @@ let sampleBills = [
         noVotes: 80,
         userVote: nil,
         comments: [],
-        lastUpdated: Date()
+        lastUpdated: Date(),
+        isFollowed: false
     ),
     Bill(
         id: UUID(),
@@ -124,7 +126,8 @@ let sampleBills = [
         noVotes: 80,
         userVote: nil,
         comments: [],
-        lastUpdated: Date()
+        lastUpdated: Date(),
+        isFollowed: false
     ),
     Bill(
         id: UUID(),
@@ -139,7 +142,8 @@ let sampleBills = [
         noVotes: 80,
         userVote: nil,
         comments: [],
-        lastUpdated: Date()
+        lastUpdated: Date(),
+        isFollowed: false
     ),
     Bill(
         id: UUID(),
@@ -154,7 +158,8 @@ let sampleBills = [
         noVotes: 80,
         userVote: nil,
         comments: [],
-        lastUpdated: Date()
+        lastUpdated: Date(),
+        isFollowed: false
     ),
     Bill(
         id: UUID(),
@@ -169,7 +174,8 @@ let sampleBills = [
         noVotes: 80,
         userVote: nil,
         comments: [],
-        lastUpdated: Date()
+        lastUpdated: Date(),
+        isFollowed: false
     ),
 ]
 
@@ -202,7 +208,8 @@ let sampleLegislators = [
             FundingRecord(source: "Individual Contributions", amount: 500000, date: Date()),
             FundingRecord(source: "PAC Contributions", amount: 250000, date: Date().addingTimeInterval(-86400)),
             FundingRecord(source: "Self-Funding", amount: 100000, date: Date().addingTimeInterval(-172800))
-        ]
+        ],
+        isFollowed: true
     ),
     Legislator(
         name: "Jane Doe",
@@ -232,7 +239,8 @@ let sampleLegislators = [
             FundingRecord(source: "Individual Contributions", amount: 500000, date: Date()),
             FundingRecord(source: "PAC Contributions", amount: 250000, date: Date().addingTimeInterval(-86400)),
             FundingRecord(source: "Self-Funding", amount: 100000, date: Date().addingTimeInterval(-172800))
-        ]
+        ],
+        isFollowed: true
     ),
     Legislator(
         name: "Peter Abbarno",
@@ -262,7 +270,8 @@ let sampleLegislators = [
             FundingRecord(source: "Individual Contributions", amount: 500000, date: Date()),
             FundingRecord(source: "PAC Contributions", amount: 250000, date: Date().addingTimeInterval(-86400)),
             FundingRecord(source: "Self-Funding", amount: 100000, date: Date().addingTimeInterval(-172800))
-        ]
+        ],
+        isFollowed: false
     ),
     Legislator(
         name: "Dan Newhouse",
@@ -283,7 +292,8 @@ let sampleLegislators = [
             instagram: "repNewhouse"
         ),
         votingRecord: [],
-        fundingRecord: []
+        fundingRecord: [],
+        isFollowed: false
     ),
     Legislator(
         name: "Marie Glusenkamp-Perez",
@@ -304,7 +314,8 @@ let sampleLegislators = [
             instagram: "@repMarieGP"
         ),
         votingRecord: [],
-        fundingRecord: []
+        fundingRecord: [],
+        isFollowed: false
     ),
     Legislator(
         name: "Maria Cantwell",
@@ -325,7 +336,8 @@ let sampleLegislators = [
             instagram: "@senatorCantwell"
         ),
         votingRecord: [],
-        fundingRecord: []
+        fundingRecord: [],
+        isFollowed: false
     ),
     Legislator(
         name: "Patty Murray",
@@ -346,6 +358,7 @@ let sampleLegislators = [
             instagram: "@senatorMurray"
         ),
         votingRecord: [],
-        fundingRecord: []
+        fundingRecord: [],
+        isFollowed: false
     ),
 ]
