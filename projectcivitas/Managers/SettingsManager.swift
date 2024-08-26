@@ -1,3 +1,7 @@
+//
+//  SettingsManager.swift
+//
+
 import Foundation
 
 struct UserProfile {

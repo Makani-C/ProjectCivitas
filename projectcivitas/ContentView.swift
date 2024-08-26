@@ -191,19 +191,19 @@ struct AssociatedItemsCarousel: View {
                     }
                     .padding(.trailing, 40) // Add extra padding to show partial next card
                 }
-                #if compiler(>=5.9)
+#if compiler(>=5.9)
                 .onChange(of: currentIndex) { oldIndex, newIndex in
                     withAnimation {
                         proxy.scrollTo(newIndex, anchor: .leading)
                     }
                 }
-                #else
+#else
                 .onChange(of: currentIndex) { newIndex in
                     withAnimation {
                         proxy.scrollTo(newIndex, anchor: .leading)
                     }
                 }
-                #endif
+#endif
             }
         }
         .background(
@@ -785,15 +785,23 @@ struct LegislatorDetailPage: View {
     }
     
     struct ScoreSection: View {
-        let attendanceScore: Double
-        let alignmentScore: Double
+        let attendanceScore: Double?
+        let alignmentScore: Double?
         
         var body: some View {
             VStack(alignment: .leading, spacing: 8) {
-                Text("Attendance Score: \(String(format: "%.0f", attendanceScore))%").font(.headline)
-                    .foregroundColor(.oldGloryRed)
-                Text("Alignment Score: \(String(format: "%.0f", alignmentScore))%").font(.headline)
-                    .foregroundColor(.oldGloryRed)
+                Text("Attendance Score: \(scoreText(attendanceScore))")
+                    .font(.headline)
+                Text("Alignment Score: \(scoreText(alignmentScore))")
+                    .font(.headline)
+            }
+        }
+        
+        private func scoreText(_ score: Double?) -> String {
+            if let score = score {
+                return String(format: "%.0f%%", score)
+            } else {
+                return "N/A"
             }
         }
     }

@@ -1,8 +1,5 @@
 //
 //  Filters.swift
-//  projectcivitas
-//
-//  Created by Makani Cartwright on 8/22/24.
 //
 
 import Foundation
