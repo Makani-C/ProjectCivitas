@@ -136,7 +136,7 @@ struct TagFilterButton: View {
                 .padding(.horizontal, 10)
                 .padding(.vertical, 5)
                 .background(isSelected ? .white : Color.gray.opacity(0.8))
-                .foregroundColor(.oldGloryBlue)
+                .foregroundColor(isSelected ? .oldGloryRed : .oldGloryBlue)
                 .cornerRadius(15)
         }
     }
