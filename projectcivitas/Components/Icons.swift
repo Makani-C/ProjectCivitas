@@ -11,6 +11,6 @@ struct FollowStar: View {
     var body: some View {
         Image(systemName: "star.fill")
             .foregroundColor(isFollowed ? .oldGloryBlue : .clear)
-            .font(.system(size: 12))
+            .font(.system(size: 16))
     }
 }

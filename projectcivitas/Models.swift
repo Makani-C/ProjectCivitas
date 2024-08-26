@@ -6,7 +6,6 @@ import Foundation
 
 protocol Followable: Identifiable {
     var id: UUID { get }
-    var isFollowed: Bool { get set }
 }
 
 enum Vote: String {
@@ -27,7 +26,6 @@ struct Bill: Identifiable, Followable {
     var userVote: Vote?
     var comments: [Comment]
     let lastUpdated: Date
-    var isFollowed: Bool
     
     var totalCommentCount: Int {
         comments.reduce(0) { $0 + $1.totalReplyCount + 1 }
@@ -47,7 +45,6 @@ struct Legislator: Identifiable, Followable {
     let socialMedia: SocialMedia
     let votingRecord: [VotingRecord]
     let fundingRecord: [FundingRecord]
-    var isFollowed: Bool
     
     func alignmentScore(with userVotes: [UUID: Vote]) -> Double? {
         let totalVotes = votingRecord.count

@@ -77,8 +77,7 @@ let sampleBills = [
         noVotes: 80,
         userVote: nil,
         comments: sampleComments,
-        lastUpdated: Date(),
-        isFollowed: true
+        lastUpdated: Date()
     ),
     Bill(
         id: UUID(),
@@ -93,8 +92,7 @@ let sampleBills = [
         noVotes: 0,
         userVote: nil,
         comments: [],
-        lastUpdated: Date(),
-        isFollowed: true
+        lastUpdated: Date()
     ),
     Bill(
         
@@ -110,8 +108,7 @@ let sampleBills = [
         noVotes: 80,
         userVote: nil,
         comments: [],
-        lastUpdated: Date(),
-        isFollowed: false
+        lastUpdated: Date()
     ),
     Bill(
         id: UUID(),
@@ -126,8 +123,7 @@ let sampleBills = [
         noVotes: 80,
         userVote: nil,
         comments: [],
-        lastUpdated: Date(),
-        isFollowed: false
+        lastUpdated: Date()
     ),
     Bill(
         id: UUID(),
@@ -142,8 +138,7 @@ let sampleBills = [
         noVotes: 80,
         userVote: nil,
         comments: [],
-        lastUpdated: Date(),
-        isFollowed: false
+        lastUpdated: Date()
     ),
     Bill(
         id: UUID(),
@@ -158,8 +153,7 @@ let sampleBills = [
         noVotes: 80,
         userVote: nil,
         comments: [],
-        lastUpdated: Date(),
-        isFollowed: false
+        lastUpdated: Date()
     ),
     Bill(
         id: UUID(),
@@ -174,8 +168,7 @@ let sampleBills = [
         noVotes: 80,
         userVote: nil,
         comments: [],
-        lastUpdated: Date(),
-        isFollowed: false
+        lastUpdated: Date()
     ),
 ]
 
@@ -208,8 +201,7 @@ let sampleLegislators = [
             FundingRecord(source: "Individual Contributions", amount: 500000, date: Date()),
             FundingRecord(source: "PAC Contributions", amount: 250000, date: Date().addingTimeInterval(-86400)),
             FundingRecord(source: "Self-Funding", amount: 100000, date: Date().addingTimeInterval(-172800))
-        ],
-        isFollowed: true
+        ]
     ),
     Legislator(
         name: "Jane Doe",
@@ -239,8 +231,7 @@ let sampleLegislators = [
             FundingRecord(source: "Individual Contributions", amount: 500000, date: Date()),
             FundingRecord(source: "PAC Contributions", amount: 250000, date: Date().addingTimeInterval(-86400)),
             FundingRecord(source: "Self-Funding", amount: 100000, date: Date().addingTimeInterval(-172800))
-        ],
-        isFollowed: true
+        ]
     ),
     Legislator(
         name: "Peter Abbarno",
@@ -270,8 +261,7 @@ let sampleLegislators = [
             FundingRecord(source: "Individual Contributions", amount: 500000, date: Date()),
             FundingRecord(source: "PAC Contributions", amount: 250000, date: Date().addingTimeInterval(-86400)),
             FundingRecord(source: "Self-Funding", amount: 100000, date: Date().addingTimeInterval(-172800))
-        ],
-        isFollowed: false
+        ]
     ),
     Legislator(
         name: "Dan Newhouse",
@@ -292,8 +282,7 @@ let sampleLegislators = [
             instagram: "repNewhouse"
         ),
         votingRecord: [],
-        fundingRecord: [],
-        isFollowed: false
+        fundingRecord: []
     ),
     Legislator(
         name: "Marie Glusenkamp-Perez",
@@ -314,8 +303,7 @@ let sampleLegislators = [
             instagram: "@repMarieGP"
         ),
         votingRecord: [],
-        fundingRecord: [],
-        isFollowed: false
+        fundingRecord: []
     ),
     Legislator(
         name: "Maria Cantwell",
@@ -336,8 +324,7 @@ let sampleLegislators = [
             instagram: "@senatorCantwell"
         ),
         votingRecord: [],
-        fundingRecord: [],
-        isFollowed: false
+        fundingRecord: []
     ),
     Legislator(
         name: "Patty Murray",
@@ -358,7 +345,6 @@ let sampleLegislators = [
             instagram: "@senatorMurray"
         ),
         votingRecord: [],
-        fundingRecord: [],
-        isFollowed: false
+        fundingRecord: []
     ),
 ]

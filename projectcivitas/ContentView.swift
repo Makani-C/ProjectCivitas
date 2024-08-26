@@ -93,30 +93,31 @@ struct FeedView: View {
                         .font(.largeTitle)
                         .fontWeight(.bold)
                         .foregroundColor(.white)
-                }
-                
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack {
-                        ForEach(allTags, id: \.self) { tag in
-                            TagFilterButton(tag: tag, isSelected: selectedTags.contains(tag)) {
-                                if selectedTags.contains(tag) {
-                                    selectedTags.remove(tag)
-                                } else {
-                                    selectedTags.insert(tag)
+                    Divider().background(.white).bold()
+                    VStack(alignment: .leading, content: {
+                        Text("Tags").foregroundColor(.white).bold().padding(.horizontal)
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack {
+                                ForEach(allTags, id: \.self) { tag in
+                                    TagFilterButton(tag: tag, isSelected: selectedTags.contains(tag)) {
+                                        if selectedTags.contains(tag) {
+                                            selectedTags.remove(tag)
+                                        } else {
+                                            selectedTags.insert(tag)
+                                        }
+                                    }
                                 }
                             }
                         }
-                    }
-                    .padding()
+                    })
                 }
-                
                 ScrollView {
                     LazyVStack(spacing: 16) {
                         ForEach(filteredFeedItems) { item in
                             FeedItemView(item: item)
                         }
                     }
-                    .padding()
+                    .padding(.horizontal)
                 }
             }
             .navigationBarHidden(true)
@@ -134,8 +135,8 @@ struct TagFilterButton: View {
             Text(tag)
                 .padding(.horizontal, 10)
                 .padding(.vertical, 5)
-                .background(isSelected ? Color.oldGloryBlue : Color.gray.opacity(0.2))
-                .foregroundColor(isSelected ? .white : .oldGloryBlue)
+                .background(isSelected ? .white : Color.gray.opacity(0.8))
+                .foregroundColor(.oldGloryBlue)
                 .cornerRadius(15)
         }
     }
@@ -307,6 +308,7 @@ struct CatalogPage: View {
                 .font(.largeTitle)
                 .fontWeight(.bold)
                 .foregroundColor(.white)
+            Divider().background(.white).bold()
             
             TextField("Search", text: selectedTab == .bills ? $billFilterManager.searchText : $legislatorFilterManager.searchText)
                 .padding(10)
@@ -509,7 +511,6 @@ struct BillRow: View {
                         .foregroundColor(.primary)
                         .lineLimit(2)
                         .fixedSize(horizontal: false, vertical: true)
-                    FollowStar(isFollowed: bill.isFollowed)
                 }
                 
                 Text(bill.description)
@@ -529,6 +530,7 @@ struct BillRow: View {
 
 struct BillDetailPage: View {
     @EnvironmentObject var votingManager: VotingManager
+    @EnvironmentObject var settingsManager: SettingsManager
     
     @State var bill: Bill
     @State private var showingAddComment = false
@@ -555,7 +557,7 @@ struct BillDetailPage: View {
             }
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarBackButtonHidden(true)
-            .navigationBarItems(leading: BackButton())
+            .navigationBarItems(leading: BackButton(), trailing: FollowButton(settingsManager: settingsManager, item: bill))
             .sheet(isPresented: $showingAddComment) {
                 AddCommentModal(bill: $bill, parentId: nil)
             }
@@ -568,11 +570,12 @@ struct BillDetailPage: View {
     
     private var billHeader: some View {
         HeaderView {
-            Text(bill.state)
-                .font(.largeTitle)
-                .bold()
-                .foregroundColor(.white)
-            
+            HStack {
+                Text(bill.state)
+                    .font(.largeTitle)
+                    .bold()
+                    .foregroundColor(.white)
+            }
             Text(bill.title).font(.title)
                 .bold()
                 .foregroundColor(.white)
@@ -605,7 +608,7 @@ struct BillDetailPage: View {
     }
     
     private var votingSection: some View {
-            VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 8) {
             HStack {
                 VoteButton(title: "Vote Yes", color: .fruitSaladGreen, action: { Task { await vote(.yes) } }, isSelected: bill.userVote == .yes)
                     .scaleEffect(bill.userVote == .yes ? voteButtonScale : 1.0)
@@ -703,6 +706,7 @@ struct LegislatorFilteredList: View {
 
 struct LegislatorRow: View {
     let legislator: Legislator
+    @EnvironmentObject var settingsManager: SettingsManager
     
     var body: some View {
         HStack {
@@ -720,7 +724,7 @@ struct LegislatorRow: View {
                 Text(legislator.chamber).font(.caption)
             }
             Spacer()
-            FollowStar(isFollowed: legislator.isFollowed)
+            FollowStar(isFollowed: settingsManager.isFollowing(legislator))
             Image(systemName: "chevron.right")
         }
         .padding()
@@ -739,7 +743,6 @@ struct LegislatorDetailPage: View {
             legislatorHeader
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
-                    followButton
                     ScoreSection(attendanceScore: legislator.attendanceScore(),
                                  alignmentScore: legislator.alignmentScore(with: userVotingRecord.votes))
                     InfoSection("Top Issues") {
@@ -755,19 +758,7 @@ struct LegislatorDetailPage: View {
         }
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
-        .navigationBarItems(leading: BackButton())
-    }
-    
-    private var followButton: some View {
-        Button(action: {
-            settingsManager.userProfile.toggleFollowLegislator(legislator.id)
-        }) {
-            Text(settingsManager.userProfile.isFollowing(legislator.id) ? "Unfollow" : "Follow")
-                .padding()
-                .background(Color.oldGloryBlue)
-                .foregroundColor(.white)
-                .cornerRadius(8)
-        }
+        .navigationBarItems(leading: BackButton(), trailing: FollowButton(settingsManager: settingsManager, item: legislator))
     }
     
     private var legislatorHeader: some View {

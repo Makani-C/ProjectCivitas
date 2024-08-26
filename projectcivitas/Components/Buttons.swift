@@ -38,3 +38,26 @@ struct VoteButton: View {
         }
     }
 }
+
+struct FollowButton: View {
+    @ObservedObject var settingsManager: SettingsManager
+    let item: any Followable
+    
+    var body: some View {
+        Text(settingsManager.isFollowing(item) ? "Followed" : "Follow")
+            .font(.footnote)
+            .bold()
+            .padding(.vertical, 4)
+            .padding(.horizontal, 8)
+            .background(settingsManager.isFollowing(item) ? .white : .clear)
+            .foregroundColor(settingsManager.isFollowing(item) ? Color.oldGloryRed : .white)
+            .cornerRadius(16)
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(Color.white, lineWidth: 1)
+            )
+            .onTapGesture {
+                settingsManager.toggleFollow(item)
+            }
+    }
+}
