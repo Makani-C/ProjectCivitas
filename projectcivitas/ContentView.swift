@@ -493,6 +493,7 @@ struct BillFilteredList: View {
 
 struct BillRow: View {
     let bill: Bill
+    @EnvironmentObject var settingsManager: SettingsManager
     
     var body: some View {
         NavigationLink(destination: BillDetailPage(bill: bill)) {
@@ -511,6 +512,7 @@ struct BillRow: View {
                         .foregroundColor(.primary)
                         .lineLimit(2)
                         .fixedSize(horizontal: false, vertical: true)
+                    FollowStar(isFollowed: settingsManager.isFollowing(bill))
                 }
                 
                 Text(bill.description)
@@ -719,12 +721,14 @@ struct LegislatorRow: View {
             .clipShape(Circle())
             
             VStack(alignment: .leading, spacing: 4) {
-                Text(legislator.name).font(.headline).foregroundColor(.oldGloryRed)
+                HStack {
+                    Text(legislator.name).font(.headline).foregroundColor(.oldGloryRed)
+                    FollowStar(isFollowed: settingsManager.isFollowing(legislator))
+                }
                 Text("\(legislator.party) - \(legislator.state)").font(.subheadline)
                 Text(legislator.chamber).font(.caption)
             }
             Spacer()
-            FollowStar(isFollowed: settingsManager.isFollowing(legislator))
             Image(systemName: "chevron.right")
         }
         .padding()
