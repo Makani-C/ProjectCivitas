@@ -7,64 +7,73 @@ import Foundation
 enum VotingError: Error {
     case billNotFound
     case updateFailed(Error)
+    
+    var localizedDescription: String {
+       switch self {
+       case .billNotFound:
+           return "The bill was not found in the current list of bills."
+       case .updateFailed(let error):
+           return "Failed to update the bill: \(error.localizedDescription)"
+       }
+   }
 }
 
 class VotingManager: ObservableObject {
     @Published private(set) var bills: [Bill] = []
-    private let dataSource: DataAccessLayer
+    
+    private let dataManager: DataManager
     private let userVotingRecord: UserVotingRecord
     
-    init(dataSource: DataAccessLayer, userVotingRecord: UserVotingRecord) {
-        self.dataSource = dataSource
+    init(dataManager: DataManager, userVotingRecord: UserVotingRecord) {
+        self.dataManager = dataManager
         self.userVotingRecord = userVotingRecord
         
         Task {
-            await fetchBills()
+            await syncBills()
         }
     }
     
     @MainActor
-    func fetchBills() async {
-        do {
-            bills = try await dataSource.fetchBills()
-        } catch {
-            print("Error fetching bills: \(error)")
-        }
+    private func syncBills() {
+        self.bills = dataManager.bills
     }
     
     @MainActor
-    func vote(for bill: Bill, vote: Vote) async throws {
-        guard let index = bills.firstIndex(where: { $0.id == bill.id }) else { throw VotingError.billNotFound }
-        
-        var updatedBill = bills[index]
-        
-        if let previousVote = updatedBill.userVote {
-            if previousVote == .yes {
-                updatedBill.yesVotes -= 1
-            } else if previousVote == .no {
-                updatedBill.noVotes -= 1
-            }
-        }
-        
-        updatedBill.userVote = vote
-        
-        if vote == .yes {
-            updatedBill.yesVotes += 1
-        } else if vote == .no {
-            updatedBill.noVotes += 1
-        }
-        
-        bills[index] = updatedBill
-        userVotingRecord.recordVote(billId: bill.id, vote: vote)
-        
-        Task {
-            do {
-                try await dataSource.updateBill(updatedBill)
-            } catch {
-                throw VotingError.updateFailed(error)
-            }
-        }
-    }
+   func vote(for bill: Bill, vote: Vote) async throws {
+       syncBills()
+       
+       guard let index = bills.firstIndex(where: { $0.id == bill.id }) else {
+           throw VotingError.billNotFound
+       }
+       
+       var updatedBill = bills[index]
+       
+       if let previousVote = updatedBill.userVote {
+           if previousVote == .yes {
+               updatedBill.yesVotes -= 1
+           } else if previousVote == .no {
+               updatedBill.noVotes -= 1
+           }
+       }
+       
+       updatedBill.userVote = vote
+       
+       if vote == .yes {
+           updatedBill.yesVotes += 1
+       } else if vote == .no {
+           updatedBill.noVotes += 1
+       }
+       
+       do {
+           try await dataManager.updateBill(updatedBill)
+           bills[index] = updatedBill
+           userVotingRecord.recordVote(billId: bill.id, vote: vote)
+           syncBills()
+       } catch {
+           print("Failed to update bill: \(error.localizedDescription)")
+           throw VotingError.updateFailed(error)
+       }
+   }
 }
 
 class UserVotingRecord: ObservableObject {

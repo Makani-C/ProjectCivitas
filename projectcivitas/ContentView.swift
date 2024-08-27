@@ -723,8 +723,10 @@ struct BillDetailPage: View {
                 ProgressView()
             }
         }
-        .task {
-            await fetchBill()
+        .onAppear {
+            Task {
+                await fetchBill()
+            }
         }
         .alert(item: $error) { error in
             Alert(title: Text("Error"), message: Text(error.message), dismissButton: .default(Text("OK")))
@@ -865,31 +867,34 @@ struct BillDetailPage: View {
     }
 
     private func vote(_ vote: Vote) async {
-        guard let bill = bill else { return }
+        guard let bill = bill else {
+            return
+        }
+        
         do {
             try await votingManager.vote(for: bill, vote: vote)
-            await fetchBill() // Refresh the bill data after voting
-
+            await fetchBill()
             withAnimation(.spring(response: 0.3, dampingFraction: 0.6, blendDuration: 0)) {
                 voteButtonScale = 1.2
             }
-
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                 withAnimation(.spring(response: 0.3, dampingFraction: 0.6, blendDuration: 0)) {
                     voteButtonScale = 1.0
                 }
             }
-
             celebratedVote = vote
             showingCelebration = true
         } catch {
-            self.error = IdentifiableError(message: error.localizedDescription)
+            if let votingError = error as? VotingError {
+                self.error = IdentifiableError(message: votingError.localizedDescription)
+            } else {
+                self.error = IdentifiableError(message: error.localizedDescription)
+            }
         }
     }
 
     private func fetchBill() async {
-        let fetchedBills = dataManager.bills
-        if let fetchedBill = fetchedBills.first(where: { $0.id == billId }) {
+        if let fetchedBill = dataManager.bills.first(where: { $0.id == billId }) {
             await MainActor.run {
                 self.bill = fetchedBill
             }
@@ -1574,28 +1579,31 @@ struct ContentView: View {
     
     init() {
         let dataSource = MockDataSource()
-        let userVotingRecord = UserVotingRecord()
-        self._dataManager = StateObject(wrappedValue: DataManager(dataSource: dataSource))
-        self._votingManager = StateObject(wrappedValue: VotingManager(dataSource: dataSource, userVotingRecord: userVotingRecord))
-        self._userVotingRecord = StateObject(wrappedValue: userVotingRecord)
+        let dataManager = DataManager(dataSource: dataSource)
+        self._dataManager = StateObject(wrappedValue: dataManager)
+        self._votingManager = StateObject(wrappedValue: VotingManager(dataManager: dataManager, userVotingRecord: UserVotingRecord()))
     }
     
     var body: some View {
-        if isUserLoggedIn {
-            TabView {
-                FeedView()
-                    .tabItem { Label("Feed", systemImage: "bell") }
-                CatalogPage()
-                    .tabItem { Label("Catalog", systemImage: "list.bullet") }
-                UserSettingsView()
-                    .tabItem { Label("Settings", systemImage: "gear") }
+        Group {
+            if isUserLoggedIn {
+                TabView {
+                    FeedView()
+                        .tabItem { Label("Feed", systemImage: "bell") }
+                    CatalogPage()
+                        .tabItem { Label("Catalog", systemImage: "list.bullet") }
+                    UserSettingsView()
+                        .tabItem { Label("Settings", systemImage: "gear") }
+                }
+                .environmentObject(votingManager)
+                .environmentObject(userVotingRecord)
+                .environmentObject(settingsManager)
+                .environmentObject(dataManager)
+            } else {
+                StartPage(isUserLoggedIn: $isUserLoggedIn)
             }
-            .environmentObject(votingManager)
-            .environmentObject(userVotingRecord)
-            .environmentObject(settingsManager)
-            .environmentObject(dataManager)
-        } else {
-            StartPage(isUserLoggedIn: $isUserLoggedIn)
+        }.task {
+            await dataManager.loadData()
         }
     }
 }

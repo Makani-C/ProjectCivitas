@@ -18,6 +18,7 @@ class DataManager: ObservableObject {
     @Published var bills: [Bill] = []
     @Published var legislators: [Legislator] = []
     @Published var votingRecords: [VotingRecord] = []
+    @Published var isLoading = true
 
     init(dataSource: DataAccessLayer) {
         self.dataSource = dataSource
@@ -28,12 +29,24 @@ class DataManager: ObservableObject {
 
     @MainActor
     func loadData() async {
+        isLoading = true
         do {
             bills = try await dataSource.fetchBills()
             legislators = try await dataSource.fetchLegislators()
             votingRecords = try await dataSource.fetchAllVotingRecords()
         } catch {
             print("Error loading data: \(error)")
+        }
+        isLoading = false
+    }
+    
+    @MainActor
+    func updateBill(_ updatedBill: Bill) async throws {
+        if let index = bills.firstIndex(where: { $0.id == updatedBill.id }) {
+            bills[index] = updatedBill
+            try await dataSource.updateBill(updatedBill)
+        } else {
+            throw VotingError.billNotFound
         }
     }
 
