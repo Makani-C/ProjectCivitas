@@ -7,48 +7,41 @@ protocol DataAccessLayer {
     func updateLegislator(_ legislator: Legislator) async throws
     func addComment(to billId: UUID, comment: Comment) async throws
     func fetchComments(for billId: UUID) async throws -> [Comment]
+    func fetchAllVotingRecords() async throws -> [VotingRecord]
+    func fetchVotingRecordsForLegislator(legislatorId: UUID) async throws -> [VotingRecord]
+    func fetchVotingRecordsForBill(billId: UUID) async throws -> [VotingRecord]
+    func fetchCompleteBillText(billId: UUID) async throws -> Text
 }
 
-class MockDataSource: DataAccessLayer {
-    private var bills: [Bill]
-    private var legislators: [Legislator]
-    
-    init() {
-        // Initialize with sample data
-        self.bills = sampleBills
-        self.legislators = sampleLegislators
-    }
-    
-    func fetchBills() async throws -> [Bill] {
-        return bills
-    }
-    
-    func fetchLegislators() async throws -> [Legislator] {
-        return legislators
-    }
-    
-    func updateBill(_ bill: Bill) async throws {
-        if let index = bills.firstIndex(where: { $0.id == bill.id }) {
-            bills[index] = bill
+class DataManager: ObservableObject {
+    private let dataSource: DataAccessLayer
+    @Published var bills: [Bill] = []
+    @Published var legislators: [Legislator] = []
+    @Published var votingRecords: [VotingRecord] = []
+
+    init(dataSource: DataAccessLayer) {
+        self.dataSource = dataSource
+        Task {
+            await loadData()
         }
     }
-    
-    func updateLegislator(_ legislator: Legislator) async throws {
-        if let index = legislators.firstIndex(where: { $0.id == legislator.id }) {
-            legislators[index] = legislator
+
+    @MainActor
+    func loadData() async {
+        do {
+            bills = try await dataSource.fetchBills()
+            legislators = try await dataSource.fetchLegislators()
+            votingRecords = try await dataSource.fetchAllVotingRecords()
+        } catch {
+            print("Error loading data: \(error)")
         }
     }
-    
-    func addComment(to billId: UUID, comment: Comment) async throws {
-        if let index = bills.firstIndex(where: { $0.id == billId }) {
-            bills[index].comments.append(comment)
-        }
-    }
-    
+
     func fetchComments(for billId: UUID) async throws -> [Comment] {
-        if let bill = bills.first(where: { $0.id == billId }) {
-            return bill.comments
-        }
-        return []
+        return try await dataSource.fetchComments(for: billId)
+    }
+
+    func addComment(to billId: UUID, comment: Comment) async throws {
+        try await dataSource.addComment(to: billId, comment: comment)
     }
 }

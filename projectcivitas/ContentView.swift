@@ -7,7 +7,7 @@ struct StartPage: View {
     
     @State private var showSignUp = false
     @State private var showLogin = false
-
+    
     var body: some View {
         ZStack {
             Color.oldGloryBlue.edgesIgnoringSafeArea(.all)
@@ -48,7 +48,7 @@ struct StartPage: View {
                             .padding()
                             .background(Color.oldGloryRed)
                             .cornerRadius(10)
-
+                        
                     }
                 }
                 .padding(.horizontal)
@@ -167,52 +167,33 @@ enum AssociatedItemType {
 }
 
 struct FeedView: View {
-    @State private var feedItems: [FeedItem] = [
-        FeedItem(
-            title: "New Bill Introduced",
-            description: "A new bill on environmental protection has been introduced.",
-            date: Date(),
-            associatedItems: [
-                AssociatedItem(type: .bill, itemId: UUID(), title: "EPA Bill"),
-            ],
-            tags: ["Environment", "New Legislation"]
-        ),
-        FeedItem(
-            title: "Legislator Vote",
-            description: "Your Congressperson has voted on a bill you were following",
-            date: Date(),
-            associatedItems: [
-                AssociatedItem(type: .legislator, itemId: sampleLegislators[4].id, title: sampleLegislators[4].name),
-            ],
-            tags: ["California"]
-        ),
-        FeedItem(
-            title: "New Environmental Protection Bills",
-            description: "Multiple bills on environmental protection are scheduled for a vote",
-            date: Date(),
-            associatedItems: [
-                AssociatedItem(type: .bill, itemId: UUID(), title: "EPA Bill"),
-                AssociatedItem(type: .bill, itemId: UUID(), title: "WWC Bill")
-            ],
-            tags: ["Environment"]
-        ),
-        FeedItem(
-            title: "New Cannabis Bill",
-            description: "Legislators cosponsor bill providing for banking for cannabis companies",
-            date: Date(),
-            associatedItems: [
-                AssociatedItem(type: .legislator, itemId: sampleLegislators[0].id, title: sampleLegislators[0].name),
-                AssociatedItem(type: .legislator, itemId: sampleLegislators[1].id, title: sampleLegislators[1].name),
-                AssociatedItem(type: .legislator, itemId: sampleLegislators[2].id, title: sampleLegislators[2].name),
-                AssociatedItem(type: .legislator, itemId: sampleLegislators[3].id, title: sampleLegislators[3].name),
-                AssociatedItem(type: .legislator, itemId: sampleLegislators[4].id, title: sampleLegislators[4].name),
-                AssociatedItem(type: .legislator, itemId: sampleLegislators[5].id, title: sampleLegislators[5].name),
-                AssociatedItem(type: .bill, itemId: sampleBills[0].id, title: sampleBills[0].title),
-            ],
-            tags: ["Cannabis", "Banking"]
-        )
-    ]
+    @EnvironmentObject var dataManager: DataManager
+    @State private var feedItems: [FeedItem] = []
     @State private var selectedTags: Set<String> = []
+    
+    private func generateFeedItems() {
+        // TODO - move feed generation to API
+        feedItems = [
+            FeedItem(
+                title: "New Bill Introduced",
+                description: "A new bill on environmental protection has been introduced.",
+                date: Date(),
+                associatedItems: [
+                    AssociatedItem(type: .bill, itemId: UUID(), title: "EPA Bill"),
+                ],
+                tags: ["Environment", "New Legislation"]
+            ),
+            FeedItem(
+                title: "Legislator Vote",
+                description: "Your Congressperson has voted on a bill you were following",
+                date: Date(),
+                associatedItems: [
+                    AssociatedItem(type: .legislator, itemId: UUID(), title: "TEST"),
+                ],
+                tags: ["California"]
+            ),
+        ]
+    }
     
     var filteredFeedItems: [FeedItem] {
         if selectedTags.isEmpty {
@@ -264,6 +245,9 @@ struct FeedView: View {
                 }
             }
             .navigationBarHidden(true)
+        }
+        .onAppear {
+            generateFeedItems()
         }
     }
 }
@@ -328,10 +312,10 @@ struct AssociatedItemsCarousel: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack {
                         Spacer()
-                        ForEach(items.indices, id: \.self) { index in
-                            AssociatedItemCard(item: items[index])
-                                .id(index)
-                        }
+//                        ForEach(items.indices, id: \.self) { index in
+//                            AssociatedItemCard(item: items[index])
+//                                .id(index)
+//                        }
                     }
                     .padding(.trailing, 40) // Add extra padding to show partial next card
                 }
@@ -358,45 +342,47 @@ struct AssociatedItemsCarousel: View {
     }
 }
 
-struct AssociatedItemCard: View {
-    let item: AssociatedItem
-    
-    var body: some View {
-        NavigationLink(destination: destinationView(for: item)) {
-            HStack(spacing: 4) {
-                Text(item.title)
-                    .font(.subheadline)
-                    .foregroundColor(.oldGloryBlue)
-                    .underline()
-            }
-        }
-        .buttonStyle(PlainButtonStyle())
-    }
-    
-    @ViewBuilder
-    private func destinationView(for item: AssociatedItem) -> some View {
-        switch item.type {
-        case .bill:
-            if let bill = sampleBills.first(where: { $0.id == item.itemId }) {
-                BillDetailPage(bill: bill)
-            } else {
-                Text("Bill not found")
-            }
-        case .legislator:
-            if let legislator = sampleLegislators.first(where: { $0.id == item.itemId }) {
-                LegislatorDetailPage(legislator: legislator)
-            } else {
-                Text("Legislator not found")
-            }
-        }
-    }
-}
+//struct AssociatedItemCard: View {
+//    let item: AssociatedItem
+//    
+//    var body: some View {
+//        NavigationLink(destination: destinationView(for: item)) {
+//            HStack(spacing: 4) {
+//                Text(item.title)
+//                    .font(.subheadline)
+//                    .foregroundColor(.oldGloryBlue)
+//                    .underline()
+//            }
+//        }
+//        .buttonStyle(PlainButtonStyle())
+//    }
+//    
+//    @ViewBuilder
+//    private func destinationView(for item: AssociatedItem) -> some View {
+//        switch item.type {
+//        case .bill:
+//            if let bill = sampleBills.first(where: { $0.id == item.itemId }) {
+//                BillDetailPage(bill: bill)
+//            } else {
+//                Text("Bill not found")
+//            }
+//        case .legislator:
+//            if let legislator = sampleLegislators.first(where: { $0.id == item.itemId }) {
+//                LegislatorDetailPage(legislator: legislator)
+//            } else {
+//                Text("Legislator not found")
+//            }
+//        }
+//    }
+//}
 
 // MARK: - Catalog
 
 struct CatalogPage: View {
     @EnvironmentObject var settingsManager: SettingsManager
     @EnvironmentObject var votingManager: VotingManager
+    @EnvironmentObject var dataManager: DataManager
+    
     @State private var selectedTab: CatalogTab = .bills
     @StateObject private var billFilterManager = FilterManager<Bill>(
         initialSortOption: "Updated",
@@ -507,7 +493,7 @@ struct CatalogPage: View {
     }
     
     private var filteredBills: [Bill] {
-        billFilterManager.filter(votingManager.bills) { bill, filters, searchText in
+        billFilterManager.filter(dataManager.bills) { bill, filters, searchText in
             let matchesSearch = searchText.isEmpty || bill.title.lowercased().contains(searchText.lowercased())
             let matchesFilters = filters.isEmpty || filters.allSatisfy { key, values in
                 switch key {
@@ -523,7 +509,7 @@ struct CatalogPage: View {
     }
     
     private var filteredLegislators: [Legislator] {
-        legislatorFilterManager.filter(sampleLegislators) { legislator, filters, searchText in
+        legislatorFilterManager.filter(dataManager.legislators) { legislator, filters, searchText in
             let matchesSearch = searchText.isEmpty || legislator.name.lowercased().contains(searchText.lowercased())
             let matchesFilters = filters.isEmpty || filters.allSatisfy { key, values in
                 switch key {
@@ -621,14 +607,15 @@ struct TableHeader: View {
 
 struct BillFilteredList: View {
     @ObservedObject var filterManager: FilterManager<Bill>
+    @EnvironmentObject var dataManager: DataManager
     
     let sortOptions = ["Updated", "Title", "Popularity"]
     
     var filterCategories: [FilterCategory<Bill>] {
         [
-            FilterCategory(name: "Tags", key: "tags", values: Array(Set(sampleBills.flatMap { $0.tags }))),
-            FilterCategory(name: "Sessions", key: "sessions", values: Array(Set(sampleBills.map { $0.session }))),
-            FilterCategory(name: "Bodies", key: "bodies", values: Array(Set(sampleBills.map { $0.body }))),
+            FilterCategory(name: "Tags", key: "tags", values: Array(Set(dataManager.bills.flatMap { $0.tags }))),
+            FilterCategory(name: "Sessions", key: "sessions", values: Array(Set(dataManager.bills.map { $0.session }))),
+            FilterCategory(name: "Bodies", key: "bodies", values: Array(Set(dataManager.bills.map { $0.body }))),
             FilterCategory(name: "Followed Only", key: "followed", values: ["true", "false"])
         ]
     }
@@ -643,7 +630,7 @@ struct BillRow: View {
     @EnvironmentObject var settingsManager: SettingsManager
     
     var body: some View {
-        NavigationLink(destination: BillDetailPage(bill: bill)) {
+        NavigationLink(destination: BillDetailPage(billId: bill.id)) {
             VStack(alignment: .leading, spacing: 8) {
                 HStack(alignment: .top) {
                     Text(bill.state)
@@ -680,46 +667,71 @@ struct BillRow: View {
 struct BillDetailPage: View {
     @EnvironmentObject var votingManager: VotingManager
     @EnvironmentObject var settingsManager: SettingsManager
-    
-    @State var bill: Bill
+    @EnvironmentObject var dataManager: DataManager
+
+    let billId: UUID
+    @State private var bill: Bill?
+    @State private var comments: [Comment] = []
     @State private var showingAddComment = false
     @State private var showingCelebration = false
     @State private var celebratedVote: Vote?
     @State private var voteButtonScale: CGFloat = 1.0
-    @State private var errorMessage: String?
-    
+    @State private var error: IdentifiableError?
+    @State private var showingFullText = false
+    @State private var isLoadingComments = false
+
     var body: some View {
         ZStack {
-            VStack(spacing: 0) {
-                billHeader
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 16) {
-                        citizenOpinionSection
-                        votingSection
-                        Divider()
-                        citizensBriefingSection
-                        Divider()
-                        votingRecordSection
-                        Divider()
-                        commentSection
+            if let bill = bill {
+                VStack(spacing: 0) {
+                    billHeader(bill: bill)
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 16) {
+                            citizenOpinionSection(bill: bill)
+                            votingSection(bill: bill)
+                            Divider()
+                            citizensBriefingSection(bill: bill)
+                            Divider()
+                            votingRecordSection(bill: bill)
+                            Divider()
+                            commentSection(bill: bill)
+                        }
+                        .padding()
                     }
-                    .padding()
                 }
-            }
-            .navigationBarTitleDisplayMode(.inline)
-            .navigationBarBackButtonHidden(true)
-            .navigationBarItems(leading: BackButton(), trailing: FollowButton(settingsManager: settingsManager, item: bill))
-            .sheet(isPresented: $showingAddComment) {
-                AddCommentModal(bill: $bill, parentId: nil)
-            }
-            
-            if showingCelebration, let vote = celebratedVote {
-                CelebrateVoteView(vote: vote, isPresented: $showingCelebration)
+                .navigationBarTitleDisplayMode(.inline)
+                .navigationBarBackButtonHidden(true)
+                .navigationBarItems(leading: BackButton(), trailing: FollowButton(settingsManager: settingsManager, item: bill))
+                .sheet(isPresented: $showingAddComment) {
+                    AddCommentModal(billId: bill.id, parentId: nil, onCommentAdded: {
+                        Task {
+                            await fetchComments()
+                        }
+                    })
+                }
+                .sheet(isPresented: $showingFullText) {
+                    FullTextView(text: bill.briefing) // Assuming briefing is the full text for now
+                }
+                .task {
+                    await fetchComments()
+                }
+
+                if showingCelebration, let vote = celebratedVote {
+                    CelebrateVoteView(vote: vote, isPresented: $showingCelebration)
+                }
+            } else {
+                ProgressView()
             }
         }
+        .task {
+            await fetchBill()
+        }
+        .alert(item: $error) { error in
+            Alert(title: Text("Error"), message: Text(error.message), dismissButton: .default(Text("OK")))
+        }
     }
-    
-    private var billHeader: some View {
+
+    private func billHeader(bill: Bill) -> some View {
         HeaderView {
             HStack {
                 Text(bill.state)
@@ -732,21 +744,21 @@ struct BillDetailPage: View {
                 .foregroundColor(.white)
             Text("Body: \(bill.body)").font(.subheadline).foregroundColor(.white)
             Text("Session: \(bill.session)").font(.subheadline).foregroundColor(.white)
-            tagScrollView
+            tagScrollView(tags: bill.tags)
         }
     }
-    
-    private var tagScrollView: some View {
+
+    private func tagScrollView(tags: [String]) -> some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack {
                 Text("Tags:").font(.subheadline)
                     .foregroundColor(.white)
-                ForEach(bill.tags, id: \.self) { TagChip(title: $0) }
+                ForEach(tags, id: \.self) { TagChip(title: $0) }
             }
         }
     }
-    
-    private var citizenOpinionSection: some View {
+
+    private func citizenOpinionSection(bill: Bill) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Citizens Opinion").font(.headline).foregroundColor(.oldGloryRed)
             HStack {
@@ -757,8 +769,8 @@ struct BillDetailPage: View {
             VoteDistributionBar(yesVotes: bill.yesVotes, noVotes: bill.noVotes)
         }
     }
-    
-    private var votingSection: some View {
+
+    private func votingSection(bill: Bill) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 VoteButton(title: "Vote Yes", color: .fruitSaladGreen, action: { Task { await vote(.yes) } }, isSelected: bill.userVote == .yes)
@@ -768,36 +780,14 @@ struct BillDetailPage: View {
             }
         }
     }
-    
-    private func vote(_ vote: Vote) async {
-        do {
-            try await votingManager.vote(for: bill, vote: vote)
-            updateBillState()
-            
-            withAnimation(.spring(response: 0.3, dampingFraction: 0.6, blendDuration: 0)) {
-                voteButtonScale = 1.2
-            }
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                withAnimation(.spring(response: 0.3, dampingFraction: 0.6, blendDuration: 0)) {
-                    voteButtonScale = 1.0
-                }
-            }
-            
-            celebratedVote = vote
-            showingCelebration = true
-        } catch {
-            errorMessage = error.localizedDescription
-        }
-    }
-    
-    private var citizensBriefingSection: some View {
+
+    private func citizensBriefingSection(bill: Bill) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Text("Citizens Briefing").font(.headline).fontWeight(.bold).foregroundColor(.oldGloryRed)
                 Spacer()
                 Button("See Full text") {
-                    // TODO - Add this functionality
+                    showingFullText = true
                 }
             }
             Text("This summary is generated by AI and may contain inaccuracies. Please refer to the full text for official information, and contact us to report any errors.")
@@ -806,15 +796,14 @@ struct BillDetailPage: View {
             Text(bill.briefing).font(.body)
         }
     }
-    
-    private var votingRecordSection: some View {
+
+    private func votingRecordSection(bill: Bill) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Legislator Voting Record")
                 .font(.headline)
                 .foregroundColor(.oldGloryRed)
 
-            let votingRecords = bill.getVotingRecord(allVotingRecords: sampleVotingRecords)
-            let legislators = sampleLegislators
+            let votingRecords = bill.getVotingRecord(allVotingRecords: dataManager.votingRecords)
             if votingRecords.isEmpty {
                 Text("No voting records available for this bill.")
                     .foregroundColor(.secondary)
@@ -824,7 +813,7 @@ struct BillDetailPage: View {
 
                     ForEach(votingRecords) { record in
                         TableRow {
-                            if let legislator = legislators.first(where: { $0.id == record.legislatorId }) {
+                            if let legislator = dataManager.legislators.first(where: { $0.id == record.legislatorId }) {
                                 Text(legislator.name)
                                     .font(.subheadline)
                                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -851,8 +840,8 @@ struct BillDetailPage: View {
             }
         }
     }
-    
-    private var commentSection: some View {
+
+    private func commentSection(bill: Bill) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Text("Comments")
@@ -863,19 +852,77 @@ struct BillDetailPage: View {
                 Button("Add Comment") { showingAddComment = true }
             }
             
-            if bill.comments.isEmpty {
+            if isLoadingComments {
+                ProgressView()
+            } else if comments.isEmpty {
                 Text("No comments yet. Be the first to comment!")
                     .font(.subheadline)
                     .foregroundColor(.secondary)
             } else {
-                CommentsList(comments: bill.comments, bill: $bill, parentId: nil, level: 0)
+                CommentsList(comments: comments, billId: bill.id, parentId: nil, level: 0)
             }
         }
     }
-    
-    private func updateBillState() {
-        if let updatedBill = votingManager.bills.first(where: { $0.id == bill.id }) {
-            bill = updatedBill
+
+    private func vote(_ vote: Vote) async {
+        guard let bill = bill else { return }
+        do {
+            try await votingManager.vote(for: bill, vote: vote)
+            await fetchBill() // Refresh the bill data after voting
+
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.6, blendDuration: 0)) {
+                voteButtonScale = 1.2
+            }
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.6, blendDuration: 0)) {
+                    voteButtonScale = 1.0
+                }
+            }
+
+            celebratedVote = vote
+            showingCelebration = true
+        } catch {
+            self.error = IdentifiableError(message: error.localizedDescription)
+        }
+    }
+
+    private func fetchBill() async {
+        let fetchedBills = dataManager.bills
+        if let fetchedBill = fetchedBills.first(where: { $0.id == billId }) {
+            await MainActor.run {
+                self.bill = fetchedBill
+            }
+        } else {
+            error = IdentifiableError(message: "Bill not found")
+        }
+    }
+
+    private func fetchComments() async {
+        isLoadingComments = true
+        do {
+            comments = try await dataManager.fetchComments(for: billId)
+        } catch {
+            self.error = IdentifiableError(message: "Failed to load comments: \(error.localizedDescription)")
+        }
+        isLoadingComments = false
+    }
+}
+
+struct FullTextView: View {
+    let text: String
+    @Environment(\.presentationMode) var presentationMode
+
+    var body: some View {
+        NavigationView {
+            ScrollView {
+                Text(text)
+                    .padding()
+            }
+            .navigationBarTitle("Full Bill Text", displayMode: .inline)
+            .navigationBarItems(trailing: Button("Done") {
+                presentationMode.wrappedValue.dismiss()
+            })
         }
     }
 }
@@ -884,14 +931,16 @@ struct BillDetailPage: View {
 
 struct LegislatorFilteredList: View {
     @ObservedObject var filterManager: FilterManager<Legislator>
+    @EnvironmentObject var dataManager: DataManager
+    
     
     let sortOptions = ["Name", "State", "Party"]
     
     var filterCategories: [FilterCategory<Legislator>] {
         [
-            FilterCategory(name: "Parties", key: "parties", values: Array(Set(sampleLegislators.map { $0.party }))),
-            FilterCategory(name: "States", key: "states", values: Array(Set(sampleLegislators.map { $0.state }))),
-            FilterCategory(name: "Chambers", key: "chambers", values: Array(Set(sampleLegislators.map { $0.chamber }))),
+            FilterCategory(name: "Parties", key: "parties", values: Array(Set(dataManager.legislators.map { $0.party }))),
+            FilterCategory(name: "States", key: "states", values: Array(Set(dataManager.legislators.map { $0.state }))),
+            FilterCategory(name: "Chambers", key: "chambers", values: Array(Set(dataManager.legislators.map { $0.chamber }))),
             FilterCategory(name: "Followed Only", key: "followed", values: ["true", "false"])
         ]
     }
@@ -936,8 +985,7 @@ struct LegislatorDetailPage: View {
     @EnvironmentObject var votingManager: VotingManager
     @EnvironmentObject var userVotingRecord: UserVotingRecord
     @EnvironmentObject var settingsManager: SettingsManager
-    
-    var votingRecords = sampleVotingRecords;
+    @EnvironmentObject var dataManager: DataManager
     
     var body: some View {
         VStack(spacing: 0) {
@@ -945,15 +993,15 @@ struct LegislatorDetailPage: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     ScoreSection(
-                        attendanceScore: legislator.attendanceScore(votingRecords: votingRecords),
-                        alignmentScore: legislator.alignmentScore(with: userVotingRecord.votes, votingRecords: votingRecords)
+                        attendanceScore: legislator.attendanceScore(votingRecords: dataManager.votingRecords),
+                        alignmentScore: legislator.alignmentScore(with: userVotingRecord.votes, votingRecords: dataManager.votingRecords)
                     )
                     InfoSection("Top Issues") {
                         ForEach(legislator.topIssues, id: \.self) { Text("• \($0)") }
                     }
                     ContactInfoSection(contactInfo: legislator.contactInfo)
                     SocialMediaSection(socialMedia: legislator.socialMedia)
-                    VotingRecordSection(votingRecord: legislator.getVotingRecord(allVotingRecords: votingRecords), votingManager: votingManager)
+                    VotingRecordSection(votingRecord: legislator.getVotingRecord(allVotingRecords: dataManager.votingRecords), votingManager: votingManager)
                     FundingRecordSection(fundingRecord: legislator.fundingRecord)
                 }
                 .padding()
@@ -1521,11 +1569,13 @@ struct ContentView: View {
     @StateObject private var userVotingRecord = UserVotingRecord()
     @StateObject private var votingManager: VotingManager
     @StateObject private var settingsManager = SettingsManager()
+    @StateObject private var dataManager: DataManager
     @State private var isUserLoggedIn = false
     
     init() {
-        let dataSource = MockDataSource() // Use MockDataSource for now
+        let dataSource = MockDataSource()
         let userVotingRecord = UserVotingRecord()
+        self._dataManager = StateObject(wrappedValue: DataManager(dataSource: dataSource))
         self._votingManager = StateObject(wrappedValue: VotingManager(dataSource: dataSource, userVotingRecord: userVotingRecord))
         self._userVotingRecord = StateObject(wrappedValue: userVotingRecord)
     }
@@ -1543,6 +1593,7 @@ struct ContentView: View {
             .environmentObject(votingManager)
             .environmentObject(userVotingRecord)
             .environmentObject(settingsManager)
+            .environmentObject(dataManager)
         } else {
             StartPage(isUserLoggedIn: $isUserLoggedIn)
         }

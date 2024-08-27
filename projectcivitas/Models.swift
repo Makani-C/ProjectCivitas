@@ -8,6 +8,12 @@ protocol Followable: Identifiable {
     var id: UUID { get }
 }
 
+struct IdentifiableError: Identifiable {
+    let id = UUID()
+    let message: String
+}
+
+
 enum Vote: String {
     case yes, no, abstain, notPresent
 }
@@ -24,12 +30,7 @@ struct Bill: Identifiable, Followable {
     var yesVotes: Int
     var noVotes: Int
     var userVote: Vote?
-    var comments: [Comment]
     let lastUpdated: Date
-    
-    var totalCommentCount: Int {
-        comments.reduce(0) { $0 + $1.totalReplyCount + 1 }
-    }
     
     func getVotingRecord(allVotingRecords: [VotingRecord]) -> [VotingRecord] {
         return allVotingRecords.filter { $0.billId == self.id }
