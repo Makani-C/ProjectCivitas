@@ -312,10 +312,10 @@ struct AssociatedItemsCarousel: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack {
                         Spacer()
-                        //                        ForEach(items.indices, id: \.self) { index in
-                        //                            AssociatedItemCard(item: items[index])
-                        //                                .id(index)
-                        //                        }
+                        ForEach(items.indices, id: \.self) { index in
+                            AssociatedItemCard(item: items[index])
+                                .id(index)
+                        }
                     }
                     .padding(.trailing, 40) // Add extra padding to show partial next card
                 }
@@ -342,39 +342,40 @@ struct AssociatedItemsCarousel: View {
     }
 }
 
-//struct AssociatedItemCard: View {
-//    let item: AssociatedItem
-//
-//    var body: some View {
-//        NavigationLink(destination: destinationView(for: item)) {
-//            HStack(spacing: 4) {
-//                Text(item.title)
-//                    .font(.subheadline)
-//                    .foregroundColor(.oldGloryBlue)
-//                    .underline()
-//            }
-//        }
-//        .buttonStyle(PlainButtonStyle())
-//    }
-//
-//    @ViewBuilder
-//    private func destinationView(for item: AssociatedItem) -> some View {
-//        switch item.type {
-//        case .bill:
-//            if let bill = sampleBills.first(where: { $0.id == item.itemId }) {
-//                BillDetailPage(bill: bill)
-//            } else {
-//                Text("Bill not found")
-//            }
-//        case .legislator:
-//            if let legislator = sampleLegislators.first(where: { $0.id == item.itemId }) {
-//                LegislatorDetailPage(legislator: legislator)
-//            } else {
-//                Text("Legislator not found")
-//            }
-//        }
-//    }
-//}
+struct AssociatedItemCard: View {
+    @EnvironmentObject var dataManager: DataManager
+    let item: AssociatedItem
+
+    var body: some View {
+        NavigationLink(destination: destinationView(for: item)) {
+            HStack(spacing: 4) {
+                Text(item.title)
+                    .font(.subheadline)
+                    .foregroundColor(.oldGloryBlue)
+                    .underline()
+            }
+        }
+        .buttonStyle(PlainButtonStyle())
+    }
+
+    @ViewBuilder
+    private func destinationView(for item: AssociatedItem) -> some View {
+        switch item.type {
+        case .bill:
+            if let bill = dataManager.bills.first(where: { $0.id == item.itemId }) {
+                BillDetailPage(billId: bill.id)
+            } else {
+                Text("Bill not found")
+            }
+        case .legislator:
+            if let legislator = dataManager.legislators.first(where: { $0.id == item.itemId }) {
+                LegislatorDetailPage(legislator: legislator)
+            } else {
+                Text("Legislator not found")
+            }
+        }
+    }
+}
 
 // MARK: - Catalog
 
