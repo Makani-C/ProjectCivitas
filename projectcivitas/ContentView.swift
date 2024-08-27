@@ -312,10 +312,10 @@ struct AssociatedItemsCarousel: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack {
                         Spacer()
-//                        ForEach(items.indices, id: \.self) { index in
-//                            AssociatedItemCard(item: items[index])
-//                                .id(index)
-//                        }
+                        //                        ForEach(items.indices, id: \.self) { index in
+                        //                            AssociatedItemCard(item: items[index])
+                        //                                .id(index)
+                        //                        }
                     }
                     .padding(.trailing, 40) // Add extra padding to show partial next card
                 }
@@ -344,7 +344,7 @@ struct AssociatedItemsCarousel: View {
 
 //struct AssociatedItemCard: View {
 //    let item: AssociatedItem
-//    
+//
 //    var body: some View {
 //        NavigationLink(destination: destinationView(for: item)) {
 //            HStack(spacing: 4) {
@@ -356,7 +356,7 @@ struct AssociatedItemsCarousel: View {
 //        }
 //        .buttonStyle(PlainButtonStyle())
 //    }
-//    
+//
 //    @ViewBuilder
 //    private func destinationView(for item: AssociatedItem) -> some View {
 //        switch item.type {
@@ -668,7 +668,8 @@ struct BillDetailPage: View {
     @EnvironmentObject var votingManager: VotingManager
     @EnvironmentObject var settingsManager: SettingsManager
     @EnvironmentObject var dataManager: DataManager
-
+    @EnvironmentObject var userVotingRecord: UserVotingRecord
+    
     let billId: UUID
     @State private var bill: Bill?
     @State private var comments: [Comment] = []
@@ -679,7 +680,7 @@ struct BillDetailPage: View {
     @State private var error: IdentifiableError?
     @State private var showingFullText = false
     @State private var isLoadingComments = false
-
+    
     var body: some View {
         ZStack {
             if let bill = bill {
@@ -715,7 +716,7 @@ struct BillDetailPage: View {
                 .task {
                     await fetchComments()
                 }
-
+                
                 if showingCelebration, let vote = celebratedVote {
                     CelebrateVoteView(vote: vote, isPresented: $showingCelebration)
                 }
@@ -732,7 +733,7 @@ struct BillDetailPage: View {
             Alert(title: Text("Error"), message: Text(error.message), dismissButton: .default(Text("OK")))
         }
     }
-
+    
     private func billHeader(bill: Bill) -> some View {
         HeaderView {
             HStack {
@@ -749,7 +750,7 @@ struct BillDetailPage: View {
             tagScrollView(tags: bill.tags)
         }
     }
-
+    
     private func tagScrollView(tags: [String]) -> some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack {
@@ -759,7 +760,7 @@ struct BillDetailPage: View {
             }
         }
     }
-
+    
     private func citizenOpinionSection(bill: Bill) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Citizens Opinion").font(.headline).foregroundColor(.oldGloryRed)
@@ -771,7 +772,7 @@ struct BillDetailPage: View {
             VoteDistributionBar(yesVotes: bill.yesVotes, noVotes: bill.noVotes)
         }
     }
-
+    
     private func votingSection(bill: Bill) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
@@ -782,7 +783,7 @@ struct BillDetailPage: View {
             }
         }
     }
-
+    
     private func citizensBriefingSection(bill: Bill) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
@@ -798,13 +799,13 @@ struct BillDetailPage: View {
             Text(bill.briefing).font(.body)
         }
     }
-
+    
     private func votingRecordSection(bill: Bill) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Legislator Voting Record")
                 .font(.headline)
                 .foregroundColor(.oldGloryRed)
-
+            
             let votingRecords = bill.getVotingRecord(allVotingRecords: dataManager.votingRecords)
             if votingRecords.isEmpty {
                 Text("No voting records available for this bill.")
@@ -812,7 +813,7 @@ struct BillDetailPage: View {
             } else {
                 VStack(spacing: 0) {
                     TableHeader(headers: ["Legislator", "Vote", "Date"])
-
+                    
                     ForEach(votingRecords) { record in
                         TableRow {
                             if let legislator = dataManager.legislators.first(where: { $0.id == record.legislatorId }) {
@@ -842,7 +843,7 @@ struct BillDetailPage: View {
             }
         }
     }
-
+    
     private func commentSection(bill: Bill) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
@@ -865,7 +866,7 @@ struct BillDetailPage: View {
             }
         }
     }
-
+    
     private func vote(_ vote: Vote) async {
         guard let bill = bill else {
             return
@@ -892,7 +893,7 @@ struct BillDetailPage: View {
             }
         }
     }
-
+    
     private func fetchBill() async {
         if let fetchedBill = dataManager.bills.first(where: { $0.id == billId }) {
             await MainActor.run {
@@ -902,7 +903,7 @@ struct BillDetailPage: View {
             error = IdentifiableError(message: "Bill not found")
         }
     }
-
+    
     private func fetchComments() async {
         isLoadingComments = true
         do {
@@ -917,7 +918,7 @@ struct BillDetailPage: View {
 struct FullTextView: View {
     let text: String
     @Environment(\.presentationMode) var presentationMode
-
+    
     var body: some View {
         NavigationView {
             ScrollView {

@@ -35,7 +35,11 @@ class VotingManager: ObservableObject {
     
     @MainActor
     private func syncBills() {
-        self.bills = dataManager.bills
+        self.bills = dataManager.bills.map { bill in
+            var updatedBill = bill
+            updatedBill.userVote = userVotingRecord.getVote(for: bill.id)
+            return updatedBill
+        }
     }
     
     @MainActor
@@ -69,6 +73,7 @@ class VotingManager: ObservableObject {
            bills[index] = updatedBill
            userVotingRecord.recordVote(billId: bill.id, vote: vote)
            syncBills()
+           self.objectWillChange.send()
        } catch {
            print("Failed to update bill: \(error.localizedDescription)")
            throw VotingError.updateFailed(error)
@@ -79,7 +84,13 @@ class VotingManager: ObservableObject {
 class UserVotingRecord: ObservableObject {
     @Published var votes: [UUID: Vote] = [:]
     
+    @MainActor
     func recordVote(billId: UUID, vote: Vote) {
         votes[billId] = vote
+        self.objectWillChange.send()
+    }
+    
+    func getVote(for billId: UUID) -> Vote? {
+        return votes[billId]
     }
 }
