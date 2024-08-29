@@ -18,7 +18,7 @@ enum VotingError: Error {
    }
 }
 
-class VotingManager: ObservableObject {
+class VoteManager: ObservableObject {
     @Published private(set) var bills: [Bill] = []
     
     private let dataManager: DataManager

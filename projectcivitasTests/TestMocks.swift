@@ -1,11 +1,15 @@
 //
-//  TestDataManager.swift
+//  TestMocks.swift
+//  projectcivitasTests
+//
+//  Created by Makani Cartwright on 8/29/24.
 //
 
-import XCTest
+import Foundation
 @testable import projectcivitas
 
-class MockDataSource: DataSourceProtocol {
+
+class TestDataSource: DataSourceProtocol {
     var bills: [Bill]
     var legislators: [Legislator]
     var votingRecords: [VotingRecord]
@@ -56,74 +60,5 @@ class MockDataSource: DataSourceProtocol {
         } else {
             comments[billId] = [comment]
         }
-    }
-}
-
-class DataManagerTests: XCTestCase {
-    var dataManager: DataManager!
-    var mockDataSource: MockDataSource!
-
-    override func setUp() {
-        super.setUp()
-        mockDataSource = MockDataSource()
-        dataManager = DataManager(dataSource: mockDataSource)
-    }
-
-    override func tearDown() {
-        dataManager = nil
-        mockDataSource = nil
-        super.tearDown()
-    }
-
-    func testLoadData() async throws {
-        // When
-        await dataManager.loadData()
-
-        // Then
-        XCTAssertEqual(dataManager.bills.count, 1)
-        XCTAssertEqual(dataManager.legislators.count, 1)
-        XCTAssertEqual(dataManager.votingRecords.count, 1)
-        XCTAssertFalse(dataManager.isLoading)
-    }
-
-    func testUpdateBill() async throws {
-        // Given
-        await dataManager.loadData()
-
-        // When
-        var updatedBill = dataManager.bills[0]
-        updatedBill.userVote = Vote.yes
-        try await dataManager.updateBill(updatedBill)
-
-        // Then
-        XCTAssertEqual(dataManager.bills[0].userVote, Vote.yes)
-    }
-
-    func testFetchComments() async throws {
-        // Given
-        let billId = UUID()
-        let comment = Comment(user: "Test User", text: "Test Comment", timestamp: Date(), parentId: nil, replies: [], upvotes: 0, userHasUpvoted: false)
-        mockDataSource.comments[billId] = [comment]
-
-        // When
-        let fetchedComments = try await dataManager.getComments(for: billId)
-
-        // Then
-        XCTAssertEqual(fetchedComments.count, 1)
-        XCTAssertEqual(fetchedComments[0].text, "Test Comment")
-    }
-
-    func testAddComment() async throws {
-        // Given
-        let billId = UUID()
-        let comment = Comment(user: "Test User", text: "Test Comment", timestamp: Date(), parentId: nil, replies: [], upvotes: 0, userHasUpvoted: false)
-
-        // When
-        try await dataManager.addComment(to: billId, comment: comment)
-
-        // Then
-        let fetchedComments = try await dataManager.getComments(for: billId)
-        XCTAssertEqual(fetchedComments.count, 1)
-        XCTAssertEqual(fetchedComments[0].text, "Test Comment")
     }
 }

@@ -11,15 +11,6 @@ enum DataManagerError: Error {
     case updateFailed(Error)
 }
 
-protocol DataManagerProtocol {
-    var bills: [Bill] { get }
-    var legislators: [Legislator] { get }
-    var votingRecords: [VotingRecord] { get }
-    
-    func loadData() async
-    func fetchComments(for billId: UUID) async throws -> [Comment]
-}
-
 protocol DataSourceProtocol {
     func fetchBills() async throws -> [Bill]
     func updateBill(_ bill: Bill) async throws
@@ -77,6 +68,13 @@ class DataManager: ObservableObject {
         } catch {
             throw DataManagerError.updateFailed(error)
         }
+    }
+    
+    func getBill(for billId: UUID) async throws -> Bill {
+        guard let index = bills.firstIndex(where: { $0.id == billId }) else {
+            throw DataManagerError.billNotFound
+        }
+        return bills[index]
     }
     
     func getComments(for billId: UUID) async throws -> [Comment] {

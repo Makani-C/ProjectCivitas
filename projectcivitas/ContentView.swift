@@ -344,7 +344,7 @@ struct AssociatedItemsCarousel: View {
 
 struct AssociatedItemCard: View {
     @EnvironmentObject var dataManager: DataManager
-    @EnvironmentObject var votingManager: VotingManager
+    @EnvironmentObject var votingManager: VoteManager
     @EnvironmentObject var settingsManager: SettingsManager
     @EnvironmentObject var userVotingRecord: UserVotingRecord
     
@@ -385,7 +385,7 @@ struct AssociatedItemCard: View {
 
 struct CatalogPage: View {
     @EnvironmentObject var settingsManager: SettingsManager
-    @EnvironmentObject var votingManager: VotingManager
+    @EnvironmentObject var votingManager: VoteManager
     @EnvironmentObject var dataManager: DataManager
     
     @State private var selectedTab: CatalogTab = .bills
@@ -608,336 +608,6 @@ struct TableHeader: View {
     }
 }
 
-// MARK: - Bills
-
-struct BillFilteredList: View {
-    @ObservedObject var filterManager: FilterManager<Bill>
-    @EnvironmentObject var dataManager: DataManager
-    
-    let sortOptions = ["Updated", "Title", "Popularity"]
-    
-    var filterCategories: [FilterCategory<Bill>] {
-        [
-            FilterCategory(name: "Tags", key: "tags", values: Array(Set(dataManager.bills.flatMap { $0.tags }))),
-            FilterCategory(name: "Sessions", key: "sessions", values: Array(Set(dataManager.bills.map { $0.session }))),
-            FilterCategory(name: "Bodies", key: "bodies", values: Array(Set(dataManager.bills.map { $0.body }))),
-            FilterCategory(name: "Followed Only", key: "followed", values: ["true", "false"])
-        ]
-    }
-    
-    var body: some View {
-        FilteredList(filterManager: filterManager, sortOptions: sortOptions, filterCategories: filterCategories)
-    }
-}
-
-struct BillRow: View {
-    let bill: Bill
-    @EnvironmentObject var settingsManager: SettingsManager
-    
-    var body: some View {
-        NavigationLink(destination: BillDetailPage(billId: bill.id)) {
-            VStack(alignment: .leading, spacing: 8) {
-                HStack(alignment: .top) {
-                    Text(bill.state)
-                        .font(.headline)
-                        .foregroundColor(.red)
-                        .lineLimit(1)
-                    
-                    Divider()
-                        .frame(height: 20)
-                    
-                    Text(bill.title)
-                        .font(.headline)
-                        .foregroundColor(.primary)
-                        .lineLimit(2)
-                        .fixedSize(horizontal: false, vertical: true)
-                    FollowStar(isFollowed: settingsManager.isFollowing(bill))
-                }
-                
-                Text(bill.description)
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                    .lineLimit(3)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .multilineTextAlignment(.leading)
-            }
-            .padding()
-            .frame(maxWidth: .infinity, alignment: .leading)
-        }
-        .background(Color.white)
-        Divider()
-    }
-}
-
-struct BillDetailPage: View {
-    @EnvironmentObject var votingManager: VotingManager
-    @EnvironmentObject var settingsManager: SettingsManager
-    @EnvironmentObject var dataManager: DataManager
-    @EnvironmentObject var userVotingRecord: UserVotingRecord
-    
-    let billId: UUID
-    @State private var bill: Bill?
-    @State private var comments: [Comment] = []
-    @State private var showingAddComment = false
-    @State private var showingCelebration = false
-    @State private var celebratedVote: Vote?
-    @State private var voteButtonScale: CGFloat = 1.0
-    @State private var error: IdentifiableError?
-    @State private var showingFullText = false
-    @State private var isLoadingComments = false
-    
-    var body: some View {
-        ZStack {
-            if let bill = bill {
-                VStack(spacing: 0) {
-                    billHeader(bill: bill)
-                    ScrollView {
-                        VStack(alignment: .leading, spacing: 16) {
-                            citizenOpinionSection(bill: bill)
-                            votingSection(bill: bill)
-                            Divider()
-                            citizensBriefingSection(bill: bill)
-                            Divider()
-                            votingRecordSection(bill: bill)
-                            Divider()
-                            commentSection(bill: bill)
-                        }
-                        .padding()
-                    }
-                }
-                .navigationBarTitleDisplayMode(.inline)
-                .navigationBarBackButtonHidden(true)
-                .navigationBarItems(leading: BackButton(), trailing: FollowButton(settingsManager: settingsManager, item: bill))
-                .sheet(isPresented: $showingAddComment) {
-                    AddCommentModal(billId: bill.id, parentId: nil, onCommentAdded: {
-                        Task {
-                            await fetchComments()
-                        }
-                    })
-                }
-                .sheet(isPresented: $showingFullText) {
-                    FullTextView(text: bill.briefing) // Assuming briefing is the full text for now
-                }
-                .task {
-                    await fetchComments()
-                }
-                
-                if showingCelebration, let vote = celebratedVote {
-                    CelebrateVoteView(vote: vote, isPresented: $showingCelebration)
-                }
-            } else {
-                ProgressView()
-            }
-        }
-        .onAppear {
-            Task {
-                await fetchBill()
-            }
-        }
-        .alert(item: $error) { error in
-            Alert(title: Text("Error"), message: Text(error.message), dismissButton: .default(Text("OK")))
-        }
-    }
-    
-    private func billHeader(bill: Bill) -> some View {
-        HeaderView {
-            HStack {
-                Text(bill.state)
-                    .font(.largeTitle)
-                    .bold()
-                    .foregroundColor(.white)
-            }
-            Text(bill.title).font(.title)
-                .bold()
-                .foregroundColor(.white)
-            Text("Body: \(bill.body)").font(.subheadline).foregroundColor(.white)
-            Text("Session: \(bill.session)").font(.subheadline).foregroundColor(.white)
-            tagScrollView(tags: bill.tags)
-        }
-    }
-    
-    private func tagScrollView(tags: [String]) -> some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack {
-                Text("Tags:").font(.subheadline)
-                    .foregroundColor(.white)
-                ForEach(tags, id: \.self) { TagChip(title: $0) }
-            }
-        }
-    }
-    
-    private func citizenOpinionSection(bill: Bill) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Citizens Opinion").font(.headline).foregroundColor(.oldGloryRed)
-            HStack {
-                Text("Yes: \(bill.yesVotes)")
-                Spacer()
-                Text("No: \(bill.noVotes)")
-            }
-            VoteDistributionBar(yesVotes: bill.yesVotes, noVotes: bill.noVotes)
-        }
-    }
-    
-    private func votingSection(bill: Bill) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                VoteButton(title: "Vote Yes", color: .fruitSaladGreen, action: { Task { await vote(.yes) } }, isSelected: bill.userVote == .yes)
-                    .scaleEffect(bill.userVote == .yes ? voteButtonScale : 1.0)
-                VoteButton(title: "Vote No", color: .oldGloryRed, action: { Task { await vote(.no) } }, isSelected: bill.userVote == .no)
-                    .scaleEffect(bill.userVote == .no ? voteButtonScale : 1.0)
-            }
-        }
-    }
-    
-    private func citizensBriefingSection(bill: Bill) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Text("Citizens Briefing").font(.headline).fontWeight(.bold).foregroundColor(.oldGloryRed)
-                Spacer()
-                Button("See Full text") {
-                    showingFullText = true
-                }
-            }
-            Text("This summary is generated by AI and may contain inaccuracies. Please refer to the full text for official information, and contact us to report any errors.")
-                .font(.caption)
-                .foregroundColor(.secondary)
-            Text(bill.briefing).font(.body)
-        }
-    }
-    
-    private func votingRecordSection(bill: Bill) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Legislator Voting Record")
-                .font(.headline)
-                .foregroundColor(.oldGloryRed)
-            
-            let votingRecords = bill.getVotingRecord(allVotingRecords: dataManager.votingRecords)
-            if votingRecords.isEmpty {
-                Text("No voting records available for this bill.")
-                    .foregroundColor(.secondary)
-            } else {
-                VStack(spacing: 0) {
-                    TableHeader(headers: ["Legislator", "Vote", "Date"])
-                    
-                    ForEach(votingRecords) { record in
-                        TableRow {
-                            if let legislator = dataManager.legislators.first(where: { $0.id == record.legislatorId }) {
-                                Text(legislator.name)
-                                    .font(.subheadline)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                            } else {
-                                Text("Unknown Legislator")
-                                    .font(.subheadline)
-                                    .foregroundColor(.secondary)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                            }
-                            Text(record.vote.rawValue.capitalized)
-                                .font(.subheadline)
-                                .frame(maxWidth: .infinity, alignment: .center)
-                            Text(record.date, style: .date)
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                                .frame(maxWidth: .infinity, alignment: .trailing)
-                        }
-                        Divider()
-                    }
-                }
-                .background(Color.white)
-                .cornerRadius(8)
-                .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
-            }
-        }
-    }
-    
-    private func commentSection(bill: Bill) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Text("Comments")
-                    .font(.headline)
-                    .fontWeight(.bold)
-                    .foregroundColor(.oldGloryRed)
-                Spacer()
-                Button("Add Comment") { showingAddComment = true }
-            }
-            
-            if isLoadingComments {
-                ProgressView()
-            } else if comments.isEmpty {
-                Text("No comments yet. Be the first to comment!")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-            } else {
-                CommentsList(comments: comments, billId: bill.id, parentId: nil, level: 0)
-            }
-        }
-    }
-    
-    private func vote(_ vote: Vote) async {
-        guard let bill = bill else {
-            return
-        }
-        
-        do {
-            try await votingManager.vote(for: bill, vote: vote)
-            await fetchBill()
-            withAnimation(.spring(response: 0.3, dampingFraction: 0.6, blendDuration: 0)) {
-                voteButtonScale = 1.2
-            }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                withAnimation(.spring(response: 0.3, dampingFraction: 0.6, blendDuration: 0)) {
-                    voteButtonScale = 1.0
-                }
-            }
-            celebratedVote = vote
-            showingCelebration = true
-        } catch {
-            if let votingError = error as? VotingError {
-                self.error = IdentifiableError(message: votingError.localizedDescription)
-            } else {
-                self.error = IdentifiableError(message: error.localizedDescription)
-            }
-        }
-    }
-    
-    private func fetchBill() async {
-        if let fetchedBill = dataManager.bills.first(where: { $0.id == billId }) {
-            await MainActor.run {
-                self.bill = fetchedBill
-            }
-        } else {
-            error = IdentifiableError(message: "Bill not found")
-        }
-    }
-    
-    private func fetchComments() async {
-        isLoadingComments = true
-        do {
-            comments = try await dataManager.getComments(for: billId)
-        } catch {
-            self.error = IdentifiableError(message: "Failed to load comments: \(error.localizedDescription)")
-        }
-        isLoadingComments = false
-    }
-}
-
-struct FullTextView: View {
-    let text: String
-    @Environment(\.presentationMode) var presentationMode
-    
-    var body: some View {
-        NavigationView {
-            ScrollView {
-                Text(text)
-                    .padding()
-            }
-            .navigationBarTitle("Full Bill Text", displayMode: .inline)
-            .navigationBarItems(trailing: Button("Done") {
-                presentationMode.wrappedValue.dismiss()
-            })
-        }
-    }
-}
-
 // MARK: - Legislator Components
 
 struct LegislatorFilteredList: View {
@@ -993,7 +663,7 @@ struct LegislatorRow: View {
 
 struct LegislatorDetailPage: View {
     let legislator: Legislator
-    @EnvironmentObject var votingManager: VotingManager
+    @EnvironmentObject var votingManager: VoteManager
     @EnvironmentObject var userVotingRecord: UserVotingRecord
     @EnvironmentObject var settingsManager: SettingsManager
     @EnvironmentObject var dataManager: DataManager
@@ -1091,7 +761,7 @@ struct LegislatorDetailPage: View {
     }
     struct VotingRecordSection: View {
         let votingRecord: [VotingRecord]
-        let votingManager: VotingManager
+        let votingManager: VoteManager
         
         var body: some View {
             InfoSection("Recent Voting Record") {
@@ -1578,7 +1248,7 @@ struct FilteredList<T>: View {
 
 struct ContentView: View {
     @StateObject private var userVotingRecord = UserVotingRecord()
-    @StateObject private var votingManager: VotingManager
+    @StateObject private var votingManager: VoteManager
     @StateObject private var settingsManager = SettingsManager()
     @StateObject private var dataManager: DataManager
     @State private var isUserLoggedIn = false
@@ -1587,7 +1257,7 @@ struct ContentView: View {
         let dataSource = MockDataSource()
         let dataManager = DataManager(dataSource: dataSource)
         self._dataManager = StateObject(wrappedValue: dataManager)
-        self._votingManager = StateObject(wrappedValue: VotingManager(dataManager: dataManager, userVotingRecord: UserVotingRecord()))
+        self._votingManager = StateObject(wrappedValue: VoteManager(dataManager: dataManager, userVotingRecord: UserVotingRecord()))
     }
     
     var body: some View {
