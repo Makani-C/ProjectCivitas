@@ -81,6 +81,8 @@ class VotingManager: ObservableObject {
    }
 }
 
+
+
 class UserVotingRecord: ObservableObject {
     @Published var votes: [UUID: Vote] = [:]
     

@@ -1,40 +1,65 @@
+//
+//  DataManager.swift
+//
+
 import SwiftUI
 
-protocol DataAccessLayer {
-    func fetchBills() async throws -> [Bill]
-    func fetchLegislators() async throws -> [Legislator]
-    func updateBill(_ bill: Bill) async throws
-    func updateLegislator(_ legislator: Legislator) async throws
-    func addComment(to billId: UUID, comment: Comment) async throws
-    func fetchComments(for billId: UUID) async throws -> [Comment]
-    func fetchAllVotingRecords() async throws -> [VotingRecord]
-    func fetchVotingRecordsForLegislator(legislatorId: UUID) async throws -> [VotingRecord]
-    func fetchVotingRecordsForBill(billId: UUID) async throws -> [VotingRecord]
-    func fetchCompleteBillText(billId: UUID) async throws -> Text
+
+enum DataManagerError: Error {
+    case billNotFound
+    case legislatorNotFound
+    case updateFailed(Error)
 }
 
+protocol DataManagerProtocol {
+    var bills: [Bill] { get }
+    var legislators: [Legislator] { get }
+    var votingRecords: [VotingRecord] { get }
+    
+    func loadData() async
+    func fetchComments(for billId: UUID) async throws -> [Comment]
+}
+
+protocol DataSourceProtocol {
+    func fetchBills() async throws -> [Bill]
+    func updateBill(_ bill: Bill) async throws
+    
+    func fetchLegislators() async throws -> [Legislator]
+    
+    func fetchVotingRecords() async throws -> [VotingRecord]
+    
+    func fetchComments(for billId: UUID) async throws -> [Comment]
+    func addComment(_ comment: Comment, to billId: UUID) async throws
+}
+
+
 class DataManager: ObservableObject {
-    private let dataSource: DataAccessLayer
-    @Published var bills: [Bill] = []
-    @Published var legislators: [Legislator] = []
-    @Published var votingRecords: [VotingRecord] = []
-    @Published var isLoading = true
+    @Published private(set) var bills: [Bill] = []
+    @Published private(set) var legislators: [Legislator] = []
+    @Published private(set) var votingRecords: [VotingRecord] = []
+    @Published private(set) var isLoading = false
 
-    init(dataSource: DataAccessLayer) {
+    private let dataSource: DataSourceProtocol
+    
+    init(dataSource: DataSourceProtocol) {
         self.dataSource = dataSource
-        Task {
-            await loadData()
-        }
     }
-
+    
     @MainActor
     func loadData() async {
         isLoading = true
         do {
-            bills = try await dataSource.fetchBills()
-            legislators = try await dataSource.fetchLegislators()
-            votingRecords = try await dataSource.fetchAllVotingRecords()
+            async let billsFetch = dataSource.fetchBills()
+            async let legislatorsFetch = dataSource.fetchLegislators()
+            async let votingRecordsFetch = dataSource.fetchVotingRecords()
+            
+            let (fetchedBills, fetchedLegislators, fetchedVotingRecords) = try await (billsFetch, legislatorsFetch, votingRecordsFetch)
+            
+            bills = fetchedBills
+            legislators = fetchedLegislators
+            votingRecords = fetchedVotingRecords
         } catch {
+            // Handle error (e.g., show an alert, log the error)
             print("Error loading data: \(error)")
         }
         isLoading = false
@@ -42,19 +67,23 @@ class DataManager: ObservableObject {
     
     @MainActor
     func updateBill(_ updatedBill: Bill) async throws {
-        if let index = bills.firstIndex(where: { $0.id == updatedBill.id }) {
-            bills[index] = updatedBill
+        guard let index = bills.firstIndex(where: { $0.id == updatedBill.id }) else {
+            throw DataManagerError.billNotFound
+        }
+        
+        do {
             try await dataSource.updateBill(updatedBill)
-        } else {
-            throw VotingError.billNotFound
+            bills[index] = updatedBill
+        } catch {
+            throw DataManagerError.updateFailed(error)
         }
     }
-
+    
     func fetchComments(for billId: UUID) async throws -> [Comment] {
-        return try await dataSource.fetchComments(for: billId)
+        try await dataSource.fetchComments(for: billId)
     }
-
+    
     func addComment(to billId: UUID, comment: Comment) async throws {
-        try await dataSource.addComment(to: billId, comment: comment)
+        try await dataSource.addComment(comment, to: billId)
     }
 }

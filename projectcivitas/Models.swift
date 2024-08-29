@@ -27,10 +27,11 @@ struct Bill: Identifiable, Followable {
     let session: String
     let tags: [String]
     let briefing: String
+    let lastUpdated: Date
+    
     var yesVotes: Int
     var noVotes: Int
     var userVote: Vote?
-    let lastUpdated: Date
     
     func getVotingRecord(allVotingRecords: [VotingRecord]) -> [VotingRecord] {
         return allVotingRecords.filter { $0.billId == self.id }
