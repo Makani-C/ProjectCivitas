@@ -17,7 +17,10 @@ protocol DataSourceProtocol {
     
     func fetchLegislators() async throws -> [Legislator]
     
-    func fetchVotingRecords() async throws -> [VotingRecord]
+    func fetchLegislatorVotingRecord() async throws -> [LegislatorVote]
+    func fetchUserVotingRecord() async throws -> [UserVote]
+    
+    func updateUserVotingRecord(_ votingRecord: UserVote) async throws
     
     func fetchComments(for billId: UUID) async throws -> [Comment]
     func addComment(_ comment: Comment, to billId: UUID) async throws
@@ -26,9 +29,10 @@ protocol DataSourceProtocol {
 
 class DataManager: ObservableObject {
     @Published private(set) var bills: [Bill] = []
-    @Published private(set) var legislators: [Legislator] = []
-    @Published private(set) var votingRecords: [VotingRecord] = []
     @Published private(set) var isLoading = false
+    @Published private(set) var legislators: [Legislator] = []
+    @Published private(set) var legislatorVotes: [LegislatorVote] = []
+    @Published private(set) var userVotes: [UserVote] = []
 
     private let dataSource: DataSourceProtocol
     
@@ -42,13 +46,15 @@ class DataManager: ObservableObject {
         do {
             async let billsFetch = dataSource.fetchBills()
             async let legislatorsFetch = dataSource.fetchLegislators()
-            async let votingRecordsFetch = dataSource.fetchVotingRecords()
+            async let legislatorVotingRecordsFetch = dataSource.fetchLegislatorVotingRecord()
+            async let userVotingRecordsFetch = dataSource.fetchUserVotingRecord()
             
-            let (fetchedBills, fetchedLegislators, fetchedVotingRecords) = try await (billsFetch, legislatorsFetch, votingRecordsFetch)
+            let (fetchedBills, fetchedLegislators, fetchedLegislatorVotingRecords, fetchedUserVotingRecords) = try await (billsFetch, legislatorsFetch, legislatorVotingRecordsFetch, userVotingRecordsFetch)
             
             bills = fetchedBills
             legislators = fetchedLegislators
-            votingRecords = fetchedVotingRecords
+            legislatorVotes = fetchedLegislatorVotingRecords
+            userVotes = fetchedUserVotingRecords
         } catch {
             // Handle error (e.g., show an alert, log the error)
             print("Error loading data: \(error)")
@@ -82,12 +88,18 @@ class DataManager: ObservableObject {
     }
     
     func addComment(to billId: UUID, comment: Comment) async throws {
-        print(1)
         try await dataSource.addComment(comment, to: billId)
-        print(2)
     }
     
-    func getVotingRecords(for billId: UUID) async throws -> [VotingRecord] {
-        return self.votingRecords.filter { $0.billId == billId }
+    func updateUserVotingRecord(_ userVotingRecord: UserVote) async throws {
+        try await dataSource.updateUserVotingRecord(userVotingRecord)
+    }
+    
+    func getUserVotingRecords(for billId: UUID) async throws -> [UserVote] {
+        return self.userVotes.filter { $0.billId == billId }
+    }
+    
+    func getLegislatorVotingRecords(for billId: UUID) async throws -> [LegislatorVote] {
+        return self.legislatorVotes.filter { $0.billId == billId }
     }
 }

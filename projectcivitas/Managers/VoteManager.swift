@@ -19,80 +19,77 @@ enum VotingError: Error {
 }
 
 class VoteManager: ObservableObject {
-    @Published private(set) var bills: [Bill] = []
-    
+    private let userId: UUID
     private let dataManager: DataManager
-    private let userVotingRecord: UserVotingRecord
     
-    init(dataManager: DataManager, userVotingRecord: UserVotingRecord) {
+    init(userId: UUID, dataManager: DataManager) {
+        self.userId = userId
         self.dataManager = dataManager
-        self.userVotingRecord = userVotingRecord
-        
-        Task {
-            await syncBills()
-        }
-    }
-    
-    @MainActor
-    private func syncBills() {
-        self.bills = dataManager.bills.map { bill in
-            var updatedBill = bill
-            updatedBill.userVote = userVotingRecord.getVote(for: bill.id)
-            return updatedBill
-        }
     }
     
     @MainActor
    func vote(for bill: Bill, vote: Vote) async throws {
-       syncBills()
-       
-       guard let index = bills.firstIndex(where: { $0.id == bill.id }) else {
-           throw VotingError.billNotFound
-       }
-       
-       var updatedBill = bills[index]
-       
-       if let previousVote = updatedBill.userVote {
-           if previousVote == .yes {
-               updatedBill.yesVotes -= 1
-           } else if previousVote == .no {
-               updatedBill.noVotes -= 1
-           }
-       }
-       
-       updatedBill.userVote = vote
-       
-       if vote == .yes {
-           updatedBill.yesVotes += 1
-       } else if vote == .no {
-           updatedBill.noVotes += 1
-       }
-       
        do {
-           try await dataManager.updateBill(updatedBill)
-           bills[index] = updatedBill
-           userVotingRecord.recordVote(billId: bill.id, vote: vote)
-           syncBills()
+           // TODO - fetch instead if it already exists
+           let newVotingRecord = UserVote(id: UUID(), billId: bill.id, userId: self.userId, vote: vote, date: Date())
+           try await dataManager.updateUserVotingRecord(newVotingRecord)
            self.objectWillChange.send()
        } catch {
            print("Failed to update bill: \(error.localizedDescription)")
            throw VotingError.updateFailed(error)
        }
    }
-}
-
-
-
-class UserVotingRecord: ObservableObject {
-    @Published var votes: [UUID: Vote] = [:]
     
-    @MainActor
-    func recordVote(billId: UUID, vote: Vote) {
-        votes[billId] = vote
-        self.objectWillChange.send()
+    func getUserBillVotingRecord(billId: UUID) -> [UserVote] {
+        return dataManager.userVotes.filter { $0.billId == billId }
     }
     
-    func getVote(for billId: UUID) -> Vote? {
-        return votes[billId]
+    func getLegislatorBillVotingRecord(billId: UUID) -> [LegislatorVote] {
+        return dataManager.legislatorVotes.filter { $0.billId == billId }
+    }
+    
+    func getLegislatorVotingRecord(legislatorId: UUID) -> [LegislatorVote] {
+        return dataManager.legislatorVotes.filter { $0.legislatorId == legislatorId }
+    }
+    
+    func getUserVotingRecord(userId: UUID) -> [UserVote] {
+        return dataManager.userVotes.filter { $0.userId == userId }
+    }
+    
+    func getUserLegislatorAlignmentScore(legislatorId: UUID, userId: UUID) -> Double? {
+        let legislatorVotes = getLegislatorVotingRecord(legislatorId: legislatorId)
+        let userVotes = getUserVotingRecord(userId: userId)
+        
+        let legislatorVotesDict = Dictionary(uniqueKeysWithValues: legislatorVotes.map { ($0.billId, $0.vote) })
+    
+        var totalVotesOnSameBills = 0
+        var matchingVoteCount = 0
+        for userVote in userVotes {
+            if let legislatorVote = legislatorVotesDict[userVote.billId] {
+                totalVotesOnSameBills += 1
+                if userVote.vote == legislatorVote {
+                    matchingVoteCount += 1
+                }
+            }
+        }
+        guard totalVotesOnSameBills > 0 else { return nil }
+        
+        return Double(matchingVoteCount) / Double(totalVotesOnSameBills) * 100
+    }
+    
+    func getLegislatorAttendanceScore(for legislatorId: UUID) -> Double? {
+        let legislatorVotes = getLegislatorVotingRecord(legislatorId: legislatorId)
+
+        var totalVotes = 0
+        var attendedVotes = 0
+        for vote in legislatorVotes where vote.legislatorId == legislatorId {
+            totalVotes += 1
+            if vote.vote != .notPresent {
+                attendedVotes += 1
+            }
+        }
+        
+        guard totalVotes > 0 else { return nil }
+        return Double(attendedVotes) / Double(totalVotes) * 100
     }
 }

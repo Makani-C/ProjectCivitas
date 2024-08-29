@@ -2,16 +2,18 @@ import Foundation
 import SwiftUI
 
 class MockDataSource: DataSourceProtocol {
-    
+
     private var bills: [Bill]
     private var legislators: [Legislator]
-    private var votingRecords: [VotingRecord]
+    private var legislatorVotes: [LegislatorVote]
+    private var userVotes: [UserVote]
     private var comments: [UUID: [Comment]]
 
     init() {
         self.bills = MockDataSource.createSampleBills()
         self.legislators = MockDataSource.createSampleLegislators()
-        self.votingRecords = MockDataSource.createSampleVotingRecords(bills: self.bills, legislators: self.legislators)
+        self.legislatorVotes = MockDataSource.createSampleVotes(bills: self.bills, legislators: self.legislators)
+        self.userVotes = []
         self.comments = MockDataSource.createSampleComments(bills: self.bills)
     }
 
@@ -22,16 +24,20 @@ class MockDataSource: DataSourceProtocol {
     func fetchLegislators() async throws -> [Legislator] {
         return legislators
     }
-
+    
     func updateBill(_ bill: Bill) async throws {
         if let index = bills.firstIndex(where: { $0.id == bill.id }) {
             bills[index] = bill
+        } else {
+            throw DataManagerError.billNotFound
         }
     }
 
     func updateLegislator(_ legislator: Legislator) async throws {
         if let index = legislators.firstIndex(where: { $0.id == legislator.id }) {
             legislators[index] = legislator
+        } else {
+            throw DataManagerError.legislatorNotFound
         }
     }
 
@@ -46,17 +52,19 @@ class MockDataSource: DataSourceProtocol {
     func fetchComments(for billId: UUID) async throws -> [Comment] {
         return comments[billId] ?? []
     }
-
-    func fetchVotingRecords() async throws -> [VotingRecord] {
-        return votingRecords
+    
+    func fetchLegislatorVotingRecord() async throws -> [LegislatorVote] {
+        return legislatorVotes
     }
-
-    func fetchVotingRecordsForLegislator(legislatorId: UUID) async throws -> [VotingRecord] {
-        return votingRecords.filter { $0.legislatorId == legislatorId }
+    
+    func fetchUserVotingRecord() async throws -> [UserVote] {
+        return userVotes
     }
-
-    func fetchVotingRecordsForBill(billId: UUID) async throws -> [VotingRecord] {
-        return votingRecords.filter { $0.billId == billId }
+    
+    func updateUserVotingRecord(_ userVote: UserVote) async throws {
+        if let index = userVotes.firstIndex(where: { $0.id == userVote.id }) {
+            userVotes[index] = userVote
+        }
     }
 
     func fetchCompleteBillText(billId: UUID) async throws -> String {
@@ -335,13 +343,13 @@ class MockDataSource: DataSourceProtocol {
         ]
     }
 
-    private static func createSampleVotingRecords(bills: [Bill], legislators: [Legislator]) -> [VotingRecord] {
-        var records: [VotingRecord] = []
+    private static func createSampleVotes(bills: [Bill], legislators: [Legislator]) -> [LegislatorVote] {
+        var records: [LegislatorVote] = []
         
         for (index, bill) in bills.enumerated() {
             for (legIndex, legislator) in legislators.enumerated() {
                 let vote: Vote = [Vote.yes, Vote.no, Vote.abstain, Vote.notPresent][Int.random(in: 0...3)]
-                let record = VotingRecord(
+                let record = LegislatorVote(
                     id: UUID(),
                     billId: bill.id,
                     legislatorId: legislator.id,

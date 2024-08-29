@@ -94,7 +94,7 @@ struct BillDetailPage: View {
                             Divider()
                             citizensBriefingSection(bill: bill)
                             Divider()
-                            votingRecordSection(bill: bill)
+                            votingRecordSection(legislatorVotes: votingManager.getLegislatorBillVotingRecord(billId: bill.id))
                             Divider()
                             commentSection(bill: bill)
                         }
@@ -199,23 +199,22 @@ struct BillDetailPage: View {
         }
     }
     
-    private func votingRecordSection(bill: Bill) -> some View {
+    private func votingRecordSection(legislatorVotes: [LegislatorVote]) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Legislator Voting Record")
                 .font(.headline)
                 .foregroundColor(.oldGloryRed)
-            
-            let votingRecords = bill.getVotingRecord(allVotingRecords: dataManager.votingRecords)
-            if votingRecords.isEmpty {
+
+            if legislatorVotes.isEmpty {
                 Text("No voting records available for this bill.")
                     .foregroundColor(.secondary)
             } else {
                 VStack(spacing: 0) {
                     TableHeader(headers: ["Legislator", "Vote", "Date"])
                     
-                    ForEach(votingRecords) { record in
+                    ForEach(legislatorVotes) { vote in
                         TableRow {
-                            if let legislator = dataManager.legislators.first(where: { $0.id == record.legislatorId }) {
+                            if let legislator = dataManager.legislators.first(where: { $0.id == vote.legislatorId }) {
                                 Text(legislator.name)
                                     .font(.subheadline)
                                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -225,10 +224,10 @@ struct BillDetailPage: View {
                                     .foregroundColor(.secondary)
                                     .frame(maxWidth: .infinity, alignment: .leading)
                             }
-                            Text(record.vote.rawValue.capitalized)
+                            Text(vote.vote.rawValue.capitalized)
                                 .font(.subheadline)
                                 .frame(maxWidth: .infinity, alignment: .center)
-                            Text(record.date, style: .date)
+                            Text(vote.date, style: .date)
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                                 .frame(maxWidth: .infinity, alignment: .trailing)

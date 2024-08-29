@@ -28,7 +28,8 @@ class DataManagerTests: XCTestCase {
         // Then
         XCTAssertEqual(testDataManager.bills.count, 1)
         XCTAssertEqual(testDataManager.legislators.count, 1)
-        XCTAssertEqual(testDataManager.votingRecords.count, 1)
+        XCTAssertEqual(testDataManager.legislatorVotes.count, 1)
+        XCTAssertEqual(testDataManager.userVotes.count, 0)
         XCTAssertFalse(testDataManager.isLoading)
     }
 
@@ -49,7 +50,7 @@ class DataManagerTests: XCTestCase {
         // Given
         let billId = UUID()
         let comment = Comment(user: "Test User", text: "Test Comment", timestamp: Date(), parentId: nil, replies: [], upvotes: 0, userHasUpvoted: false)
-        testDataSource.comments[billId] = [comment]
+        try await testDataManager.addComment(to: billId, comment: comment)
 
         // When
         let fetchedComments = try await testDataManager.getComments(for: billId)

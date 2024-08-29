@@ -346,7 +346,6 @@ struct AssociatedItemCard: View {
     @EnvironmentObject var dataManager: DataManager
     @EnvironmentObject var votingManager: VoteManager
     @EnvironmentObject var settingsManager: SettingsManager
-    @EnvironmentObject var userVotingRecord: UserVotingRecord
     
     let item: AssociatedItem
     
@@ -664,7 +663,6 @@ struct LegislatorRow: View {
 struct LegislatorDetailPage: View {
     let legislator: Legislator
     @EnvironmentObject var votingManager: VoteManager
-    @EnvironmentObject var userVotingRecord: UserVotingRecord
     @EnvironmentObject var settingsManager: SettingsManager
     @EnvironmentObject var dataManager: DataManager
     
@@ -674,15 +672,15 @@ struct LegislatorDetailPage: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     ScoreSection(
-                        attendanceScore: legislator.attendanceScore(votingRecords: dataManager.votingRecords),
-                        alignmentScore: legislator.alignmentScore(with: userVotingRecord.votes, votingRecords: dataManager.votingRecords)
+                        attendanceScore: votingManager.getLegislatorAttendanceScore(for: legislator.id),
+                        alignmentScore: votingManager.getUserLegislatorAlignmentScore(legislatorId: legislator.id, userId: settingsManager.userId)
                     )
                     InfoSection("Top Issues") {
                         ForEach(legislator.topIssues, id: \.self) { Text("• \($0)") }
                     }
                     ContactInfoSection(contactInfo: legislator.contactInfo)
                     SocialMediaSection(socialMedia: legislator.socialMedia)
-                    VotingRecordSection(votingRecord: legislator.getVotingRecord(allVotingRecords: dataManager.votingRecords), votingManager: votingManager)
+                    VotingRecordSection(legislatorVotes: votingManager.getLegislatorVotingRecord(legislatorId: legislator.id), bills: dataManager.bills)
                     FundingRecordSection(fundingRecord: legislator.fundingRecord)
                 }
                 .padding()
@@ -759,18 +757,18 @@ struct LegislatorDetailPage: View {
             }
         }
     }
+    
     struct VotingRecordSection: View {
-        let votingRecord: [VotingRecord]
-        let votingManager: VoteManager
+        let legislatorVotes: [LegislatorVote]
+        let bills: [Bill]
         
         var body: some View {
             InfoSection("Recent Voting Record") {
                 VStack(spacing: 0) {
                     TableHeader(headers: ["Bill", "Vote", "Date"])
-                    
-                    ForEach(votingRecord.prefix(5)) { record in
+                    ForEach(legislatorVotes.prefix(5)) { legislatorVote in
                         TableRow {
-                            if let bill = votingManager.bills.first(where: { $0.id == record.billId }) {
+                            if let bill = bills.first(where: { $0.id == legislatorVote.billId }) {
                                 Text(bill.title)
                                     .font(.subheadline)
                                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -780,10 +778,10 @@ struct LegislatorDetailPage: View {
                                     .foregroundColor(.secondary)
                                     .frame(maxWidth: .infinity, alignment: .leading)
                             }
-                            Text(record.vote.rawValue)
+                            Text(legislatorVote.vote.rawValue)
                                 .font(.subheadline)
                                 .frame(maxWidth: .infinity, alignment: .leading)
-                            Text(record.date, formatter: itemFormatter)
+                            Text(legislatorVote.date, formatter: itemFormatter)
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -795,7 +793,7 @@ struct LegislatorDetailPage: View {
                 .cornerRadius(8)
                 .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
                 
-                if votingRecord.count > 5 {
+                if legislatorVotes.count > 5 {
                     Button("See full voting record") {
                         // Implement navigation to full voting record view
                     }
@@ -1029,7 +1027,7 @@ struct VoteDistributionBar: View {
 // MARK: - UserSettings
 
 struct UserSettingsView: View {
-    @StateObject private var settingsManager = SettingsManager()
+    @EnvironmentObject var settingsManager: SettingsManager
     
     var body: some View {
         NavigationView {
@@ -1247,17 +1245,22 @@ struct FilteredList<T>: View {
 
 
 struct ContentView: View {
-    @StateObject private var userVotingRecord = UserVotingRecord()
     @StateObject private var votingManager: VoteManager
-    @StateObject private var settingsManager = SettingsManager()
+    @StateObject private var settingsManager: SettingsManager
     @StateObject private var dataManager: DataManager
+    
     @State private var isUserLoggedIn = false
     
     init() {
+        let userId = UUID()
+        
         let dataSource = MockDataSource()
         let dataManager = DataManager(dataSource: dataSource)
+        let settingsManager = SettingsManager(userId: userId)
+        
         self._dataManager = StateObject(wrappedValue: dataManager)
-        self._votingManager = StateObject(wrappedValue: VoteManager(dataManager: dataManager, userVotingRecord: UserVotingRecord()))
+        self._settingsManager = StateObject(wrappedValue: settingsManager)
+        self._votingManager = StateObject(wrappedValue: VoteManager(userId: userId, dataManager: dataManager))
     }
     
     var body: some View {
@@ -1272,7 +1275,6 @@ struct ContentView: View {
                         .tabItem { Label("Settings", systemImage: "gear") }
                 }
                 .environmentObject(votingManager)
-                .environmentObject(userVotingRecord)
                 .environmentObject(settingsManager)
                 .environmentObject(dataManager)
             } else {
