@@ -8,61 +8,86 @@ struct StartPage: View {
     @State private var showSignUp = false
     @State private var showLogin = false
     
+    @State private var email = ""
+    @State private var password = ""
+    
     var body: some View {
         ZStack {
             Color.oldGloryBlue.edgesIgnoringSafeArea(.all)
             
             VStack(spacing: 20) {
-                Image(systemName: "flag.fill")
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 80, height: 80)
-                    .foregroundColor(.white)
+                Spacer()
+                Text("🇺🇸")
+                    .font(.system(size: 100))
                 
-                Text("Welcome to Civitas")
+                Text("Welcome to USAgora!")
                     .font(.system(size: 32, weight: .bold))
                     .foregroundColor(.white)
                 
-                Text("Your platform for engaging with democracy and making your voice heard.")
+                Text("Your centralized platform for democratic engagement")
                     .font(.system(size: 18))
                     .foregroundColor(.white)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal)
                 
                 VStack(spacing: 12) {
-                    Button(action: { showSignUp = true }) {
-                        Text("Sign Up")
-                            .font(.headline)
-                            .foregroundColor(.oldGloryBlue)
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color.white)
-                            .cornerRadius(10)
-                    }
+                    TextField("Email", text: $email)
+                        .autocapitalization(.none)
+                        .keyboardType(.emailAddress)
+                        .modifier(LoginTextFieldStyle())
+                    
+                    SecureField("Password", text: $password)
+                        .modifier(LoginTextFieldStyle())
+                    
                     
                     Button(action: { isUserLoggedIn = true; showLogin = true }) {
                         Text("Log In")
                             .font(.headline)
                             .foregroundColor(.white)
+                            .bold()
                             .frame(maxWidth: .infinity)
                             .padding()
                             .background(Color.oldGloryRed)
                             .cornerRadius(10)
-                        
+                    }
+                    Button(action: { showSignUp = true }) {
+                        Text("Don't have an account? Sign up!")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .bold()
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(.clear)
                     }
                 }
-                .padding(.horizontal)
-                .padding(.top, 20)
-                
+                    .padding(.horizontal)
+                    .padding(.top, 20)
+                Spacer()
                 Spacer()
             }
-            .padding()
+            .padding(.horizontal)
         }
         .sheet(isPresented: $showSignUp) {
             SignUpView(isUserLoggedIn: $isUserLoggedIn)
         }
         .sheet(isPresented: $showLogin) {
             Text("Login View")
+        }
+    }
+
+
+
+    struct LoginTextFieldStyle: ViewModifier {
+        func body(content: Content) -> some View {
+            content
+            .padding()
+            .background(Color.white)
+            .cornerRadius(8)
+            .overlay(
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(Color.oldGloryBlue.opacity(0.5), lineWidth: 1)
+            )
+            .shadow(color: Color.black.opacity(0.1), radius: 3, x: 0, y: 2)
         }
     }
     
