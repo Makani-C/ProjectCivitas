@@ -344,8 +344,12 @@ struct AssociatedItemsCarousel: View {
 
 struct AssociatedItemCard: View {
     @EnvironmentObject var dataManager: DataManager
+    @EnvironmentObject var votingManager: VotingManager
+    @EnvironmentObject var settingsManager: SettingsManager
+    @EnvironmentObject var userVotingRecord: UserVotingRecord
+    
     let item: AssociatedItem
-
+    
     var body: some View {
         NavigationLink(destination: destinationView(for: item)) {
             HStack(spacing: 4) {
@@ -357,7 +361,7 @@ struct AssociatedItemCard: View {
         }
         .buttonStyle(PlainButtonStyle())
     }
-
+    
     @ViewBuilder
     private func destinationView(for item: AssociatedItem) -> some View {
         switch item.type {
@@ -908,7 +912,7 @@ struct BillDetailPage: View {
     private func fetchComments() async {
         isLoadingComments = true
         do {
-            comments = try await dataManager.fetchComments(for: billId)
+            comments = try await dataManager.getComments(for: billId)
         } catch {
             self.error = IdentifiableError(message: "Failed to load comments: \(error.localizedDescription)")
         }

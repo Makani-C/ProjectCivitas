@@ -99,7 +99,7 @@ struct CommentRow: View {
 
     private func fetchUpdatedComments() async {
         do {
-            let updatedComments = try await dataManager.fetchComments(for: billId)
+            let updatedComments = try await dataManager.getComments(for: billId)
             if let updatedComment = findComment(id: comment.id, in: updatedComments) {
                 updateComment(updatedComment)
             }
@@ -169,7 +169,7 @@ struct CommentsList: View {
                 // Here you would typically call an API to update the comment
                 // For now, we'll just simulate it with a delay
                 try await Task.sleep(nanoseconds: 1_000_000_000) // 1 second delay
-                let updatedComments = try await dataManager.fetchComments(for: billId)
+                let updatedComments = try await dataManager.getComments(for: billId)
                 await MainActor.run {
                     // Update the UI with the fetched comments
                     // This might require restructuring how we store and update comments

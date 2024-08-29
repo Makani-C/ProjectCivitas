@@ -79,11 +79,17 @@ class DataManager: ObservableObject {
         }
     }
     
-    func fetchComments(for billId: UUID) async throws -> [Comment] {
+    func getComments(for billId: UUID) async throws -> [Comment] {
         try await dataSource.fetchComments(for: billId)
     }
     
     func addComment(to billId: UUID, comment: Comment) async throws {
+        print(1)
         try await dataSource.addComment(comment, to: billId)
+        print(2)
+    }
+    
+    func getVotingRecords(for billId: UUID) async throws -> [VotingRecord] {
+        return self.votingRecords.filter { $0.billId == billId }
     }
 }

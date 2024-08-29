@@ -106,7 +106,7 @@ class DataManagerTests: XCTestCase {
         mockDataSource.comments[billId] = [comment]
 
         // When
-        let fetchedComments = try await dataManager.fetchComments(for: billId)
+        let fetchedComments = try await dataManager.getComments(for: billId)
 
         // Then
         XCTAssertEqual(fetchedComments.count, 1)
@@ -122,7 +122,7 @@ class DataManagerTests: XCTestCase {
         try await dataManager.addComment(to: billId, comment: comment)
 
         // Then
-        let fetchedComments = try await dataManager.fetchComments(for: billId)
+        let fetchedComments = try await dataManager.getComments(for: billId)
         XCTAssertEqual(fetchedComments.count, 1)
         XCTAssertEqual(fetchedComments[0].text, "Test Comment")
     }

@@ -150,6 +150,8 @@
 		12A72EF12C77D85A00865382 /* projectcivitas */ = {
 			isa = PBXGroup;
 			children = (
+				12C5CDA42C80BD8E0043778E /* ViewModels */,
+				12C5CDA12C80BD1E0043778E /* Views */,
 				12A72EF42C77D85A00865382 /* ContentView.swift */,
 				12D4CC0F2C780BF00099D272 /* Models.swift */,
 				12727C652C78F81900FD1C91 /* App */,
@@ -177,6 +179,20 @@
 				12C5CD9C2C80B81A0043778E /* TestDataManager.swift */,
 			);
 			path = projectcivitasTests;
+			sourceTree = "<group>";
+		};
+		12C5CDA12C80BD1E0043778E /* Views */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		12C5CDA42C80BD8E0043778E /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = ViewModels;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
