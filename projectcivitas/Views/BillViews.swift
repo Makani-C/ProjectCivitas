@@ -62,7 +62,7 @@ struct BillRow: View {
             .padding()
             .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .background(Color.white)
+        .buttonStyle(CustomNavigationLinkStyle())
         Divider()
     }
 }

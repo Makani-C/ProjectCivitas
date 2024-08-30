@@ -27,6 +27,9 @@
 		12C5CDB52C8118D30043778E /* VoteManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C5CDB42C8118D30043778E /* VoteManagerTests.swift */; };
 		12C5CDB72C814DB20043778E /* BillDetailViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C5CDB62C814DB20043778E /* BillDetailViewModelTests.swift */; };
 		12C5CDB92C8152170043778E /* StartPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C5CDB82C8152170043778E /* StartPage.swift */; };
+		12C5CDBB2C8210010043778E /* FeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C5CDBA2C8210010043778E /* FeedView.swift */; };
+		12C5CDBD2C82122D0043778E /* CatalogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C5CDBC2C82122D0043778E /* CatalogView.swift */; };
+		12C5CDBF2C821C970043778E /* CustomStyles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C5CDBE2C821C970043778E /* CustomStyles.swift */; };
 		12D4CC0E2C780BA30099D272 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12D4CC0D2C780BA30099D272 /* Colors.swift */; };
 		12D4CC102C780BF00099D272 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12D4CC0F2C780BF00099D272 /* Models.swift */; };
 		12D4CC122C780E600099D272 /* VoteManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12D4CC112C780E600099D272 /* VoteManager.swift */; };
@@ -67,6 +70,9 @@
 		12C5CDB42C8118D30043778E /* VoteManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoteManagerTests.swift; sourceTree = "<group>"; };
 		12C5CDB62C814DB20043778E /* BillDetailViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BillDetailViewModelTests.swift; sourceTree = "<group>"; };
 		12C5CDB82C8152170043778E /* StartPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartPage.swift; sourceTree = "<group>"; };
+		12C5CDBA2C8210010043778E /* FeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedView.swift; sourceTree = "<group>"; };
+		12C5CDBC2C82122D0043778E /* CatalogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatalogView.swift; sourceTree = "<group>"; };
+		12C5CDBE2C821C970043778E /* CustomStyles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomStyles.swift; sourceTree = "<group>"; };
 		12D4CC0D2C780BA30099D272 /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
 		12D4CC0F2C780BF00099D272 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		12D4CC112C780E600099D272 /* VoteManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoteManager.swift; sourceTree = "<group>"; };
@@ -137,6 +143,7 @@
 			isa = PBXGroup;
 			children = (
 				12D4CC0D2C780BA30099D272 /* Colors.swift */,
+				12C5CDBE2C821C970043778E /* CustomStyles.swift */,
 			);
 			path = Styles;
 			sourceTree = "<group>";
@@ -209,6 +216,8 @@
 			children = (
 				12C5CDA92C80F10E0043778E /* BillViews.swift */,
 				12C5CDB82C8152170043778E /* StartPage.swift */,
+				12C5CDBA2C8210010043778E /* FeedView.swift */,
+				12C5CDBC2C82122D0043778E /* CatalogView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -321,11 +330,14 @@
 				12D4CC102C780BF00099D272 /* Models.swift in Sources */,
 				12773BC42C7D0D4F00C6E037 /* FilterManager.swift in Sources */,
 				12C5CDB92C8152170043778E /* StartPage.swift in Sources */,
+				12C5CDBB2C8210010043778E /* FeedView.swift in Sources */,
 				12727C702C79002E00FD1C91 /* Comments.swift in Sources */,
 				12A72EF32C77D85A00865382 /* projectcivitasApp.swift in Sources */,
 				12C5CDAC2C80F6B60043778E /* BillDetailViewModel.swift in Sources */,
 				12773BC62C7D0FE500C6E037 /* Icons.swift in Sources */,
+				12C5CDBF2C821C970043778E /* CustomStyles.swift in Sources */,
 				12727C6B2C78F8BD00FD1C91 /* Chips.swift in Sources */,
+				12C5CDBD2C82122D0043778E /* CatalogView.swift in Sources */,
 				12C5CDAA2C80F10E0043778E /* BillViews.swift in Sources */,
 				12727C692C78F88D00FD1C91 /* Buttons.swift in Sources */,
 				12D4CC122C780E600099D272 /* VoteManager.swift in Sources */,
