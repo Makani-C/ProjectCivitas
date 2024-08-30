@@ -94,11 +94,34 @@ class BillDetailViewModelTests: XCTestCase {
         XCTAssertNotNil(viewModel.error)
         XCTAssertFalse(viewModel.showingCelebration)
     }
+    
+    func testVoteCountUpdate() async throws {
+        // Given
+        await viewModel.fetchBill(dataManager: testDataManager)
+        XCTAssertNotNil(viewModel.bill)
+        
+        let initialYesVotes = viewModel.bill!.yesVotes
+        let initialNoVotes = viewModel.bill!.noVotes
+        
+        // When: Vote Yes
+        await viewModel.vote(.yes, votingManager: testVoteManager, dataManager: testDataManager)
+        
+        // Then: Yes votes should increase by 1
+        XCTAssertEqual(viewModel.bill!.yesVotes, initialYesVotes + 1)
+        XCTAssertEqual(viewModel.bill!.noVotes, initialNoVotes)
+        
+        // When: Change vote to No
+        await viewModel.vote(.no, votingManager: testVoteManager, dataManager: testDataManager)
+        
+        // Then: Yes votes should decrease by 1, No votes should increase by 1
+        XCTAssertEqual(viewModel.bill!.yesVotes, initialYesVotes)
+        XCTAssertEqual(viewModel.bill!.noVotes, initialNoVotes + 1)
+    }
 }
 
 // Mock VoteManager that always throws an error
 class ErrorVoteManager: VoteManager {
-    override func castVote(for bill: Bill, vote: Vote) async throws {
+    override func castVote(for bill: Bill, vote: Vote) async throws -> Bill {
         throw VotingError.billNotFound
     }
 }

@@ -47,10 +47,11 @@ class BillDetailViewModel: ObservableObject {
         guard let bill = bill else { return }
 
         do {
-            try await votingManager.castVote(for: bill, vote: vote)
-            await fetchBill(dataManager: dataManager)
+            let updatedBill = try await votingManager.castVote(for: bill, vote: vote)
+            self.bill = updatedBill
             celebratedVote = vote
             showingCelebration = true
+            self.objectWillChange.send()
         } catch {
             if let votingError = error as? VotingError {
                 self.error = IdentifiableError(message: votingError.localizedDescription)

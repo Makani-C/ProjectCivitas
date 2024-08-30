@@ -42,7 +42,7 @@ class VoteManagerTests: XCTestCase {
         let vote = Vote.yes
         
         // When
-        try await testVoteManager.castVote(for: bill, vote: vote)
+        _ = try await testVoteManager.castVote(for: bill, vote: vote)
         
         // Then
         let result = testVoteManager.getUserVotingRecord(for: testUserId)
@@ -85,7 +85,7 @@ class VoteManagerTests: XCTestCase {
         XCTAssertNil(score, "Alignment score should be nil when no votes have been cast")
         
         // Given a matching vote
-        try await testVoteManager.castVote(for: bill, vote: .yes)
+        _ = try await testVoteManager.castVote(for: bill, vote: .yes)
         
         // Then
         score = testVoteManager.getUserLegislatorAlignmentScore(legislatorId: legislator.id, userId: testUserId)
@@ -95,7 +95,7 @@ class VoteManagerTests: XCTestCase {
         }
         
         // Given a non-matching vote
-        try await testVoteManager.castVote(for: bill, vote: .no)
+        _ = try await testVoteManager.castVote(for: bill, vote: .no)
         
         // Then
         score = testVoteManager.getUserLegislatorAlignmentScore(legislatorId: legislator.id, userId: testUserId)

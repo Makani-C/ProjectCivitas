@@ -28,14 +28,32 @@ class VoteManager: ObservableObject {
     }
     
     @MainActor
-    func castVote(for bill: Bill, vote: Vote) async throws {
+    func castVote(for bill: Bill, vote: Vote) async throws -> Bill {
         do {
             try await dataManager.updateUserVotingRecord(billId: bill.id, userId: self.userId, vote: vote)
-            self.objectWillChange.send()
         } catch {
             print("Failed to update vote: \(error.localizedDescription)")
             throw VotingError.updateFailed(error)
         }
+        
+        var updatedBill = bill
+        if let previousVote = bill.userVote {
+            if previousVote == .yes {
+                updatedBill.yesVotes -= 1
+            } else {
+                updatedBill.noVotes -= 1
+            }
+        }
+        if vote == .yes {
+            updatedBill.yesVotes += 1
+        } else {
+            updatedBill.noVotes += 1
+        }
+        updatedBill.userVote = vote
+        try await dataManager.updateBill(updatedBill)
+        self.objectWillChange.send()
+
+        return updatedBill
     }
     
     func getUserVotes(for billId: UUID) -> [UserVote] {

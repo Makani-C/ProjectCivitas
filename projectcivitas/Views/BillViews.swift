@@ -175,10 +175,16 @@ struct BillDetailPage: View {
     private func votingSection(bill: Bill) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                VoteButton(title: "Vote Yes", color: .fruitSaladGreen, action: { Task { await vote(.yes) } }, isSelected: bill.userVote == .yes)
-                    .scaleEffect(bill.userVote == .yes ? voteButtonScale : 1.0)
-                VoteButton(title: "Vote No", color: .oldGloryRed, action: { Task { await vote(.no) } }, isSelected: bill.userVote == .no)
-                    .scaleEffect(bill.userVote == .no ? voteButtonScale : 1.0)
+                VoteButton(title: "Vote Yes", color: .fruitSaladGreen, action: {
+                    Task {
+                        await viewModel.vote(.yes, votingManager: votingManager, dataManager: dataManager)
+                    }
+                }, isSelected: bill.userVote == .yes)
+                VoteButton(title: "Vote No", color: .oldGloryRed, action: {
+                    Task {
+                        await viewModel.vote(.no, votingManager: votingManager, dataManager: dataManager)
+                    }
+                }, isSelected: bill.userVote == .no)
             }
         }
     }
@@ -261,32 +267,6 @@ struct BillDetailPage: View {
                     .foregroundColor(.secondary)
             } else {
                 CommentsList(comments: viewModel.comments, billId: bill.id, parentId: nil, level: 0)
-            }
-        }
-    }
-    
-    private func vote(_ vote: Vote) async {
-        guard let bill = viewModel.bill else {
-            return
-        }
-        
-        do {
-            try await votingManager.castVote(for: bill, vote: vote)
-            withAnimation(.spring(response: 0.3, dampingFraction: 0.6, blendDuration: 0)) {
-                voteButtonScale = 1.2
-            }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                withAnimation(.spring(response: 0.3, dampingFraction: 0.6, blendDuration: 0)) {
-                    voteButtonScale = 1.0
-                }
-            }
-            viewModel.celebratedVote = vote
-            viewModel.showingCelebration = true
-        } catch {
-            if let votingError = error as? VotingError {
-                viewModel.error = IdentifiableError(message: votingError.localizedDescription)
-            } else {
-                viewModel.error = IdentifiableError(message: error.localizedDescription)
             }
         }
     }
