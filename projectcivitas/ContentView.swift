@@ -20,8 +20,9 @@ struct StartPage: View {
                 Text("🇺🇸")
                     .font(.system(size: 100))
                 
-                Text("Welcome to USAgora!")
+                Text("Welcome to Civic Referendum")
                     .font(.system(size: 32, weight: .bold))
+                    .multilineTextAlignment(.center)
                     .foregroundColor(.white)
                 
                 Text("Your centralized platform for democratic engagement")
@@ -705,7 +706,7 @@ struct LegislatorDetailPage: View {
                     }
                     ContactInfoSection(contactInfo: legislator.contactInfo)
                     SocialMediaSection(socialMedia: legislator.socialMedia)
-                    VotingRecordSection(legislatorVotes: votingManager.getLegislatorVotingRecord(legislatorId: legislator.id), bills: dataManager.bills)
+                    VotingRecordSection(legislatorVotes: votingManager.getLegislatorVotingRecord(for: legislator.id), bills: dataManager.bills)
                     FundingRecordSection(fundingRecord: legislator.fundingRecord)
                 }
                 .padding()

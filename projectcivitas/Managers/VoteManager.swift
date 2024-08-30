@@ -28,37 +28,35 @@ class VoteManager: ObservableObject {
     }
     
     @MainActor
-   func vote(for bill: Bill, vote: Vote) async throws {
-       do {
-           // TODO - fetch instead if it already exists
-           let newVotingRecord = UserVote(id: UUID(), billId: bill.id, userId: self.userId, vote: vote, date: Date())
-           try await dataManager.updateUserVotingRecord(newVotingRecord)
-           self.objectWillChange.send()
-       } catch {
-           print("Failed to update bill: \(error.localizedDescription)")
-           throw VotingError.updateFailed(error)
-       }
-   }
+    func castVote(for bill: Bill, vote: Vote) async throws {
+        do {
+            try await dataManager.updateUserVotingRecord(billId: bill.id, userId: self.userId, vote: vote)
+            self.objectWillChange.send()
+        } catch {
+            print("Failed to update vote: \(error.localizedDescription)")
+            throw VotingError.updateFailed(error)
+        }
+    }
     
-    func getUserBillVotingRecord(billId: UUID) -> [UserVote] {
+    func getUserVotes(for billId: UUID) -> [UserVote] {
         return dataManager.userVotes.filter { $0.billId == billId }
     }
     
-    func getLegislatorBillVotingRecord(billId: UUID) -> [LegislatorVote] {
+    func getLegislatorVotes(for billId: UUID) -> [LegislatorVote] {
         return dataManager.legislatorVotes.filter { $0.billId == billId }
     }
     
-    func getLegislatorVotingRecord(legislatorId: UUID) -> [LegislatorVote] {
+    func getLegislatorVotingRecord(for legislatorId: UUID) -> [LegislatorVote] {
         return dataManager.legislatorVotes.filter { $0.legislatorId == legislatorId }
     }
     
-    func getUserVotingRecord(userId: UUID) -> [UserVote] {
+    func getUserVotingRecord(for userId: UUID) -> [UserVote] {
         return dataManager.userVotes.filter { $0.userId == userId }
     }
     
     func getUserLegislatorAlignmentScore(legislatorId: UUID, userId: UUID) -> Double? {
-        let legislatorVotes = getLegislatorVotingRecord(legislatorId: legislatorId)
-        let userVotes = getUserVotingRecord(userId: userId)
+        let legislatorVotes = getLegislatorVotingRecord(for: legislatorId)
+        let userVotes = getUserVotingRecord(for: userId)
         
         let legislatorVotesDict = Dictionary(uniqueKeysWithValues: legislatorVotes.map { ($0.billId, $0.vote) })
     
@@ -78,7 +76,7 @@ class VoteManager: ObservableObject {
     }
     
     func getLegislatorAttendanceScore(for legislatorId: UUID) -> Double? {
-        let legislatorVotes = getLegislatorVotingRecord(legislatorId: legislatorId)
+        let legislatorVotes = getLegislatorVotingRecord(for: legislatorId)
 
         var totalVotes = 0
         var attendedVotes = 0

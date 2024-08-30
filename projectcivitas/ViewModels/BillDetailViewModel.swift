@@ -47,7 +47,7 @@ class BillDetailViewModel: ObservableObject {
         guard let bill = bill else { return }
 
         do {
-            try await votingManager.vote(for: bill, vote: vote)
+            try await votingManager.castVote(for: bill, vote: vote)
             await fetchBill(dataManager: dataManager)
             celebratedVote = vote
             showingCelebration = true

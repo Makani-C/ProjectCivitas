@@ -20,7 +20,7 @@ protocol DataSourceProtocol {
     func fetchLegislatorVotingRecord() async throws -> [LegislatorVote]
     func fetchUserVotingRecord() async throws -> [UserVote]
     
-    func updateUserVotingRecord(_ votingRecord: UserVote) async throws
+    func updateUserVotingRecord(_ userVote: UserVote) async throws
     
     func fetchComments(for billId: UUID) async throws -> [Comment]
     func addComment(_ comment: Comment, to billId: UUID) async throws
@@ -91,8 +91,26 @@ class DataManager: ObservableObject {
         try await dataSource.addComment(comment, to: billId)
     }
     
-    func updateUserVotingRecord(_ userVotingRecord: UserVote) async throws {
-        try await dataSource.updateUserVotingRecord(userVotingRecord)
+    @MainActor
+    func updateUserVotingRecord(billId: UUID, userId: UUID, vote: Vote) async throws {
+        if let existingVoteIndex = userVotes.firstIndex(where: { $0.billId == billId && $0.userId == userId }) {
+            let existingVote = userVotes[existingVoteIndex]
+            if existingVote.vote != vote {
+                var updatedVote = existingVote
+                updatedVote.vote = vote
+                updatedVote.date = Date()
+                userVotes[existingVoteIndex] = updatedVote
+                try await dataSource.updateUserVotingRecord(updatedVote)
+            } else {
+                return
+            }
+        } else {
+            let newVote = UserVote(id: UUID(), billId: billId, userId: userId, vote: vote, date: Date())
+            userVotes.append(newVote)
+            try await dataSource.updateUserVotingRecord(newVote)
+        }
+
+        self.objectWillChange.send()
     }
     
     func getUserVotingRecords(for billId: UUID) async throws -> [UserVote] {

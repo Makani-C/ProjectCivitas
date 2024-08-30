@@ -94,7 +94,7 @@ struct BillDetailPage: View {
                             Divider()
                             citizensBriefingSection(bill: bill)
                             Divider()
-                            votingRecordSection(legislatorVotes: votingManager.getLegislatorBillVotingRecord(billId: bill.id))
+                            votingRecordSection(legislatorVotes: votingManager.getLegislatorVotes(for: bill.id))
                             Divider()
                             commentSection(bill: bill)
                         }
@@ -271,7 +271,7 @@ struct BillDetailPage: View {
         }
         
         do {
-            try await votingManager.vote(for: bill, vote: vote)
+            try await votingManager.castVote(for: bill, vote: vote)
             withAnimation(.spring(response: 0.3, dampingFraction: 0.6, blendDuration: 0)) {
                 voteButtonScale = 1.2
             }

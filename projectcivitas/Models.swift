@@ -72,8 +72,8 @@ struct UserVote: Identifiable {
     let id: UUID
     let billId: UUID
     let userId: UUID
-    let vote: Vote
-    let date: Date
+    var vote: Vote
+    var date: Date
 }
 
 struct FundingRecord: Identifiable {

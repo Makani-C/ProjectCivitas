@@ -64,6 +64,8 @@ class MockDataSource: DataSourceProtocol {
     func updateUserVotingRecord(_ userVote: UserVote) async throws {
         if let index = userVotes.firstIndex(where: { $0.id == userVote.id }) {
             userVotes[index] = userVote
+        } else {
+            userVotes.append(userVote)
         }
     }
 
