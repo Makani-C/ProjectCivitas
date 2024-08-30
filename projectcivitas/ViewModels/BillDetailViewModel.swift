@@ -7,13 +7,13 @@ import Foundation
 class BillDetailViewModel: ObservableObject {
     @Published var bill: Bill?
     @Published var comments: [Comment] = []
+    @Published var isLoadingBill = false
+    @Published var isLoadingComments = false
+    @Published var error: IdentifiableError?
     @Published var showingAddComment = false
     @Published var showingCelebration = false
-    @Published var celebratedVote: Vote?
-    @Published var error: IdentifiableError?
     @Published var showingFullText = false
-    @Published var isLoadingComments = false
-    @Published var isLoadingBill = false
+    @Published var celebratedVote: Vote?
 
     private let billId: UUID
 

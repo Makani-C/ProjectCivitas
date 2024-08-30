@@ -93,28 +93,28 @@ class DataManager: ObservableObject {
     
     @MainActor
     func updateUserVotingRecord(billId: UUID, userId: UUID, vote: Vote) async throws {
-        if let existingVoteIndex = userVotes.firstIndex(where: { $0.billId == billId && $0.userId == userId }) {
-            let existingVote = userVotes[existingVoteIndex]
+        if let existingVoteIndex = self.userVotes.firstIndex(where: { $0.billId == billId && $0.userId == userId }) {
+            let existingVote = self.userVotes[existingVoteIndex]
             if existingVote.vote != vote {
                 var updatedVote = existingVote
                 updatedVote.vote = vote
                 updatedVote.date = Date()
-                userVotes[existingVoteIndex] = updatedVote
+                self.userVotes[existingVoteIndex] = updatedVote
                 try await dataSource.updateUserVotingRecord(updatedVote)
             } else {
                 return
             }
         } else {
             let newVote = UserVote(id: UUID(), billId: billId, userId: userId, vote: vote, date: Date())
-            userVotes.append(newVote)
+            self.userVotes.append(newVote)
             try await dataSource.updateUserVotingRecord(newVote)
         }
 
         self.objectWillChange.send()
     }
     
-    func getUserVotingRecords(for billId: UUID) async throws -> [UserVote] {
-        return self.userVotes.filter { $0.billId == billId }
+    func getUserVotingRecords(billId: UUID, userId: UUID) async throws -> [UserVote] {
+        return self.userVotes.filter { $0.billId == billId && $0.userId == userId }
     }
     
     func getLegislatorVotingRecords(for billId: UUID) async throws -> [LegislatorVote] {
