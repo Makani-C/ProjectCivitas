@@ -30,7 +30,7 @@ struct BillRow: View {
     
     @EnvironmentObject var dataManager: DataManager
     @EnvironmentObject var settingsManager: SettingsManager
-    @EnvironmentObject var votingManager: VoteManager
+    @EnvironmentObject var voteManager: VoteManager
     
     var body: some View {
         NavigationLink(destination: BillDetailPage(billId: bill.id)) {
@@ -72,7 +72,7 @@ struct BillDetailPage: View {
     
     @EnvironmentObject var dataManager: DataManager
     @EnvironmentObject var settingsManager: SettingsManager
-    @EnvironmentObject var votingManager: VoteManager
+    @EnvironmentObject var voteManager: VoteManager
     
     @State private var voteButtonScale: CGFloat = 1.0
     
@@ -94,7 +94,7 @@ struct BillDetailPage: View {
                             Divider()
                             citizensBriefingSection(bill: bill)
                             Divider()
-                            votingRecordSection(legislatorVotes: votingManager.getLegislatorVotes(for: bill.id))
+                            votingRecordSection(legislatorVotes: voteManager.getLegislatorVotes(for: bill.id))
                             Divider()
                             commentSection(bill: bill)
                         }
@@ -177,12 +177,12 @@ struct BillDetailPage: View {
             HStack {
                 VoteButton(title: "Vote Yes", color: .fruitSaladGreen, action: {
                     Task {
-                        await viewModel.vote(.yes, votingManager: votingManager, dataManager: dataManager)
+                        await viewModel.vote(.yes, voteManager: voteManager, dataManager: dataManager)
                     }
                 }, isSelected: bill.userVote == .yes)
                 VoteButton(title: "Vote No", color: .oldGloryRed, action: {
                     Task {
-                        await viewModel.vote(.no, votingManager: votingManager, dataManager: dataManager)
+                        await viewModel.vote(.no, voteManager: voteManager, dataManager: dataManager)
                     }
                 }, isSelected: bill.userVote == .no)
             }

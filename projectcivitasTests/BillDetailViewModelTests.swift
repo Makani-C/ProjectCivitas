@@ -72,7 +72,7 @@ class BillDetailViewModelTests: XCTestCase {
         XCTAssertNotNil(viewModel.bill)
         
         // When
-        await viewModel.vote(.yes, votingManager: testVoteManager, dataManager: testDataManager)
+        await viewModel.vote(.yes, voteManager: testVoteManager, dataManager: testDataManager)
         
         // Then
         XCTAssertEqual(viewModel.celebratedVote, .yes)
@@ -88,7 +88,7 @@ class BillDetailViewModelTests: XCTestCase {
         testVoteManager = ErrorVoteManager(userId: testUserId, dataManager: testDataManager)
         
         // When
-        await viewModel.vote(.yes, votingManager: testVoteManager, dataManager: testDataManager)
+        await viewModel.vote(.yes, voteManager: testVoteManager, dataManager: testDataManager)
         
         // Then
         XCTAssertNotNil(viewModel.error)
@@ -104,14 +104,14 @@ class BillDetailViewModelTests: XCTestCase {
         let initialNoVotes = viewModel.bill!.noVotes
         
         // When: Vote Yes
-        await viewModel.vote(.yes, votingManager: testVoteManager, dataManager: testDataManager)
+        await viewModel.vote(.yes, voteManager: testVoteManager, dataManager: testDataManager)
         
         // Then: Yes votes should increase by 1
         XCTAssertEqual(viewModel.bill!.yesVotes, initialYesVotes + 1)
         XCTAssertEqual(viewModel.bill!.noVotes, initialNoVotes)
         
         // When: Change vote to No
-        await viewModel.vote(.no, votingManager: testVoteManager, dataManager: testDataManager)
+        await viewModel.vote(.no, voteManager: testVoteManager, dataManager: testDataManager)
         
         // Then: Yes votes should decrease by 1, No votes should increase by 1
         XCTAssertEqual(viewModel.bill!.yesVotes, initialYesVotes)

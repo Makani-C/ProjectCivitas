@@ -13,6 +13,7 @@ struct CatalogPage: View {
     @StateObject private var viewModel = CatalogViewModel()
     @EnvironmentObject var dataManager: DataManager
     @EnvironmentObject var settingsManager: SettingsManager
+    @EnvironmentObject var voteManager: VoteManager
     
     var body: some View {
         NavigationView {

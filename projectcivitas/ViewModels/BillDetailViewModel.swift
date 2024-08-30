@@ -43,11 +43,11 @@ class BillDetailViewModel: ObservableObject {
         isLoadingComments = false
     }
 
-    func vote(_ vote: Vote, votingManager: VoteManager, dataManager: DataManager) async {
+    func vote(_ vote: Vote, voteManager: VoteManager, dataManager: DataManager) async {
         guard let bill = bill else { return }
 
         do {
-            let updatedBill = try await votingManager.castVote(for: bill, vote: vote)
+            let updatedBill = try await voteManager.castVote(for: bill, vote: vote)
             self.bill = updatedBill
             celebratedVote = vote
             showingCelebration = true

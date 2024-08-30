@@ -216,7 +216,7 @@ struct AssociatedItemsCarousel: View {
 
 struct AssociatedItemCard: View {
     @EnvironmentObject var dataManager: DataManager
-    @EnvironmentObject var votingManager: VoteManager
+    @EnvironmentObject var voteManager: VoteManager
     @EnvironmentObject var settingsManager: SettingsManager
     
     let item: AssociatedItem
