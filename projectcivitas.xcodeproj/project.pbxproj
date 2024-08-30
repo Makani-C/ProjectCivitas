@@ -25,6 +25,7 @@
 		12C5CDAF2C80F7970043778E /* DataManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C5CDAE2C80F7970043778E /* DataManagerTests.swift */; };
 		12C5CDB32C80F8B00043778E /* TestMocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C5CDB22C80F8B00043778E /* TestMocks.swift */; };
 		12C5CDB52C8118D30043778E /* VoteManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C5CDB42C8118D30043778E /* VoteManagerTests.swift */; };
+		12C5CDB72C814DB20043778E /* BillDetailViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C5CDB62C814DB20043778E /* BillDetailViewModelTests.swift */; };
 		12D4CC0E2C780BA30099D272 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12D4CC0D2C780BA30099D272 /* Colors.swift */; };
 		12D4CC102C780BF00099D272 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12D4CC0F2C780BF00099D272 /* Models.swift */; };
 		12D4CC122C780E600099D272 /* VoteManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12D4CC112C780E600099D272 /* VoteManager.swift */; };
@@ -63,6 +64,7 @@
 		12C5CDAE2C80F7970043778E /* DataManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataManagerTests.swift; sourceTree = "<group>"; };
 		12C5CDB22C80F8B00043778E /* TestMocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestMocks.swift; sourceTree = "<group>"; };
 		12C5CDB42C8118D30043778E /* VoteManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoteManagerTests.swift; sourceTree = "<group>"; };
+		12C5CDB62C814DB20043778E /* BillDetailViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BillDetailViewModelTests.swift; sourceTree = "<group>"; };
 		12D4CC0D2C780BA30099D272 /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
 		12D4CC0F2C780BF00099D272 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		12D4CC112C780E600099D272 /* VoteManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoteManager.swift; sourceTree = "<group>"; };
@@ -187,6 +189,7 @@
 				12C5CDAE2C80F7970043778E /* DataManagerTests.swift */,
 				12C5CDB22C80F8B00043778E /* TestMocks.swift */,
 				12C5CDB42C8118D30043778E /* VoteManagerTests.swift */,
+				12C5CDB62C814DB20043778E /* BillDetailViewModelTests.swift */,
 			);
 			path = projectcivitasTests;
 			sourceTree = "<group>";
@@ -334,6 +337,7 @@
 				12A72F042C77D85B00865382 /* projectcivitasTests.swift in Sources */,
 				12C5CDB52C8118D30043778E /* VoteManagerTests.swift in Sources */,
 				12C5CDAF2C80F7970043778E /* DataManagerTests.swift in Sources */,
+				12C5CDB72C814DB20043778E /* BillDetailViewModelTests.swift in Sources */,
 				12C5CDB32C80F8B00043778E /* TestMocks.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
