@@ -1,8 +1,5 @@
 //
 //  VoteManagerTests.swift
-//  projectcivitasTests
-//
-//  Created by Makani Cartwright on 8/29/24.
 //
 
 import XCTest

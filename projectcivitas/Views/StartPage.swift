@@ -1,8 +1,5 @@
 //
 //  StartPage.swift
-//  projectcivitas
-//
-//  Created by Makani Cartwright on 8/29/24.
 //
 
 import Foundation
@@ -77,7 +74,7 @@ struct StartPage: View {
             SignUpView(isUserLoggedIn: $isUserLoggedIn)
         }
         .sheet(isPresented: $showLogin) {
-            Text("Login View")
+            ProgressView()
         }
     }
 

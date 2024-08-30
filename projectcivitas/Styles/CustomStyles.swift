@@ -1,8 +1,5 @@
 //
 //  CustomStyles.swift
-//  projectcivitas
-//
-//  Created by Makani Cartwright on 8/30/24.
 //
 
 import SwiftUI

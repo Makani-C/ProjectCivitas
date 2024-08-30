@@ -112,7 +112,7 @@ struct BillDetailPage: View {
                     })
                 }
                 .sheet(isPresented: $viewModel.showingFullText) {
-                    FullTextView(text: bill.briefing)
+                    FullBillTextView(text: bill.briefing)
                 }
                 .task {
                     await viewModel.fetchComments(dataManager: dataManager)
@@ -272,7 +272,7 @@ struct BillDetailPage: View {
     }
 }
 
-struct FullTextView: View {
+struct FullBillTextView: View {
     let text: String
     @Environment(\.presentationMode) var presentationMode
     
